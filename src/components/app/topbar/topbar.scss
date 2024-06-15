@@ -1,10 +1,11 @@
 .c-topbar {
+  @include flex(row, space-between, center);
+  flex: none;
   width: 100%;
   font-size: 14px;
   height: $topbar-h;
   border-bottom: $border-1;
   padding: 0px min(5vw, 30px);
-  @include flex(row, space-between, center);
 
   &__connect {
     @include flex(row);

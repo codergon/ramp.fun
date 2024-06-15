@@ -14,7 +14,7 @@ function App() {
             <Topbar />
 
             <Routes>
-              <Route path="/auth" element={<Home />} />
+              <Route path="/" element={<Home />} />
             </Routes>
           </div>
         </div>
