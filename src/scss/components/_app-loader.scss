@@ -1,0 +1,20 @@
+.app-loader {
+  @include flex(column, center, center, 16px);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 9999;
+  font-size: 22px;
+  background: $background;
+
+  @include tablet {
+    gap: 6px;
+    font-size: 16px;
+    background: $tab-bg;
+    svg {
+      width: 50px;
+      height: 50px;
+    }
+  }
+}

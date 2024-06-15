@@ -1,0 +1,21 @@
+.empty-state {
+  flex: 1;
+  width: 100%;
+  min-height: 250px;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  &__content {
+    @include flex(column, center, center, 12px);
+    &--icons {
+      @include flex(row, center, center, 4px);
+    }
+  }
+
+  &__text {
+    color: #ddd;
+    font-size: 16px;
+  }
+}

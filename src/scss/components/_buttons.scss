@@ -1,0 +1,164 @@
+.default-btn {
+  @include flex(row, flex-start, center);
+  flex: none;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  max-width: max-content;
+  background: $neutral-100;
+
+  &.rounded {
+    @include flex(row, center, center);
+    width: 26px;
+    padding: 0px;
+    aspect-ratio: 1;
+    max-width: 26px;
+    border-radius: 100%;
+  }
+}
+
+.c-button {
+  @include flex(row);
+  gap: 16px;
+  flex: none;
+  // min-height: 40px;
+  color: $white;
+  line-height: 1;
+  cursor: pointer;
+  min-width: 84px;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 14px 20px;
+  border: $border-1;
+  // background: $white;
+  width: max-content;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: all 0.15s ease-in-out !important;
+
+  color: $primary;
+  border-color: $black;
+  background: $neutral-100;
+
+  &--border {
+    color: $primary;
+    padding: 10px 16px;
+    background: transparent;
+    // border: 1px solid $primary;
+
+    color: $white;
+    background: #222;
+  }
+
+  &--rounded {
+    border-radius: 24px;
+  }
+}
+
+.base-btn {
+  @include flex(row);
+  gap: 6px;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: $border-1;
+  border-radius: 10px;
+  position: relative;
+  background: $primary;
+
+  color: $white;
+
+  &.disabled {
+    opacity: 0.7;
+  }
+
+  &__icon {
+    bottom: 0px;
+    right: 20px;
+    position: absolute;
+    transform: translateY(-40%);
+  }
+}
+
+.c-spinner {
+  right: 10px;
+  display: flex;
+  position: absolute;
+}
+
+.c-toggle-btns {
+  @include flex(row);
+  gap: 6px;
+  padding: 3px;
+  border-radius: 8px;
+  background: $neutral-95;
+
+  &__btn {
+    @include flex(row);
+    gap: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 6px 20px;
+    border-radius: 6px;
+    text-transform: capitalize;
+
+    &:hover {
+      background: $neutral-80;
+    }
+
+    &[data-active="true"],
+    &.active {
+      background: $tab-bg;
+      &:hover {
+        background: $tab-bg;
+      }
+    }
+  }
+
+  &.full {
+    width: 100%;
+    .c-toggle-btns__btn {
+      flex: 1;
+    }
+  }
+}
+
+.base-switch {
+  width: 42px;
+  height: 24px;
+  display: flex;
+  cursor: pointer;
+  position: relative;
+  border-radius: 30px;
+  flex-direction: row;
+  align-items: center;
+  // background: #383838;
+  border: 1px solid rgba($color: $white, $alpha: 0.19);
+
+  &:focus {
+    border: 1px solid rgba($color: $white, $alpha: 0.19);
+  }
+
+  &-toggle {
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    background: #fff;
+    border-radius: 15px;
+    transition: left 0.3s;
+    border: 1px solid rgba($color: $white, $alpha: 0.19);
+  }
+  &[data-move="true"] {
+    background: #ee6f61;
+    border: none;
+    .base-switch-toggle {
+      left: calc(50% - 0px);
+      border: none;
+      background: #fff;
+    }
+  }
+}

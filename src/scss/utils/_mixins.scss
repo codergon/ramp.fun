@@ -1,0 +1,66 @@
+// Screen size mixins
+@mixin phone {
+  @media (max-width: 490px) {
+    @content;
+  }
+}
+@mixin tablet {
+  @media (max-width: 770px) {
+    @content;
+  }
+}
+@mixin laptop {
+  @media (max-width: 1068px) {
+    @content;
+  }
+}
+@mixin laptopSm {
+  @media (max-width: 990px) {
+    @content;
+  }
+}
+@mixin desktop {
+  @media (max-width: 1600px) {
+    @content;
+  }
+}
+@mixin desktopX {
+  @media (max-width: 1800px) {
+    @content;
+  }
+}
+
+// Flex mixins
+@mixin flex($dir: column, $jc: center, $ai: center, $gap: 10px) {
+  display: flex;
+  justify-content: $jc;
+  align-items: $ai;
+  gap: $gap;
+  flex-direction: $dir;
+}
+@mixin flex_col($gap: 10px) {
+  flex-direction: column;
+  display: flex;
+  gap: $gap;
+}
+@mixin flex_row($gap: 10px) {
+  flex-direction: row;
+  display: flex;
+  gap: $gap;
+}
+
+// Cursor mixins
+@mixin cursor {
+  @media (any-pointer: fine) {
+    @content;
+  }
+}
+@mixin cursor-mobile {
+  @media (any-pointer: fine) {
+    @content;
+  }
+
+  @include media(">tablet") {
+    @content;
+  }
+}

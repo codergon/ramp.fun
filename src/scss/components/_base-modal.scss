@@ -1,0 +1,164 @@
+.base-modal {
+  gap: 20px;
+  display: flex;
+  min-height: 400px;
+  position: relative;
+  flex-direction: column;
+
+  &--action-btns {
+    @include flex(row, space-between, center);
+    top: 0px;
+    left: 0px;
+    padding: 0px 0px;
+    position: absolute;
+
+    button {
+      @include flex(row, center, center);
+      padding: 8px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #2d2d2d;
+    }
+  }
+
+  &__header {
+    @include flex(row, center, center);
+    width: 100%;
+    padding: 0px 0px;
+
+    &-block {
+      @include flex(column, center, center, 8px);
+      text-align: center;
+      h2 {
+        color: $white;
+        font-size: 22px;
+        font-weight: 500;
+        text-align: center;
+      }
+      p {
+        color: $grey;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  &__body {
+    @include flex(column, flex-start);
+    flex: 1;
+    gap: 10px;
+    width: 100%;
+    position: relative;
+
+    .r-block {
+      @include flex(row, flex-start, center, 8px);
+      flex: 1;
+    }
+
+    .row-block {
+      @include flex(row, flex-start, center, 4px);
+      gap: 16px;
+      width: 100%;
+      padding: 6px 0px;
+      &__inner {
+        gap: 10px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        &-header {
+          text-align: center;
+        }
+      }
+    }
+
+    .menu-trigger {
+      @include flex(row, space-between, center, 8px);
+      gap: 8px;
+      width: 100%;
+      height: 38px;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0px 10px;
+      border: $border-1;
+      color: $white-pure;
+      border-radius: 8px;
+      background: $neutral-120;
+      border-color: $neutral-200;
+      text-transform: uppercase;
+
+      &__icon {
+        @include flex(row, center, center);
+        color: $primary;
+        overflow: hidden;
+        border-radius: 50%;
+        img {
+          width: 24px;
+          height: 24px;
+          object-fit: cover;
+        }
+      }
+
+      p {
+        font-size: 14px;
+        span {
+          // font-size: 13px;
+          color: gray;
+        }
+      }
+    }
+  }
+}
+
+.ReactModal__Content {
+  width: 448px !important;
+  padding: 20px !important;
+  display: flex !important;
+  max-width: 95% !important;
+  border-radius: 12px !important;
+  flex-direction: column !important;
+  background: $neutral-90 !important;
+  border: none !important;
+  // border: 1px solid $neutral-200 !important;
+
+  @include tablet {
+    padding: 14px !important;
+  }
+}
+
+.ReactModal__Overlay {
+  background: rgba($color: $background, $alpha: 0.7) !important;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.toast-block {
+  li {
+    width: 391px;
+    color: $white;
+    font-size: 14px;
+    border-radius: 12px;
+    background-color: $tab-bg;
+    border: 2px solid $neutral-100;
+
+    &[data-type="error"] {
+      color: $negative-500;
+    }
+    &[data-type="success"] {
+      color: #16f19d;
+    }
+
+    [data-icon] {
+      width: 22px;
+      height: 22px;
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    [data-description] {
+      color: #aaa;
+    }
+  }
+}

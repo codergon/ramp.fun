@@ -1,0 +1,42 @@
+.search-bar {
+  @include flex(row, flex-start, center, 0px);
+  flex: 1;
+  gap: 10px;
+  height: 40px;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 4px 13px;
+  padding-left: 12px;
+  border-radius: 10px;
+  // border: $border-2d;
+  background: $neutral-80;
+
+  input {
+    flex: 1;
+    height: 26px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    &:active,
+    &:focus {
+      outline: none;
+      border: none;
+    }
+  }
+  &__shortcut {
+    @include flex(row, center, center, 0px);
+    height: 22px;
+    padding: 0px 8px;
+    font-size: 10px;
+    border-radius: 6px;
+    color: $neutral-800;
+    text-transform: uppercase;
+    background-color: $neutral-90;
+  }
+  &__icon {
+    color: $neutral-800;
+    aspect-ratio: 1;
+    border-radius: 28px;
+    @include flex(row, center, center, 0px);
+  }
+}

@@ -1,0 +1,211 @@
+.c-input {
+  @include flex(row);
+  width: 100%;
+  overflow: hidden;
+  padding: 0px 12px;
+  border-radius: 10px;
+  background: $neutral-80;
+  border: 2px solid $neutral-150;
+
+  &__icon {
+    @include flex(row, center, center);
+    width: 38px;
+    color: $primary;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba($color: $primary, $alpha: 0.08);
+  }
+
+  .max-btn {
+    @include flex(row, center, center);
+    color: $white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba($color: $primary, $alpha: 0.08);
+  }
+
+  &__block {
+    @include flex(column, flex-start, flex-start, 4px);
+    flex: 1;
+    padding: 6px 0px 8px;
+
+    input {
+      width: 100%;
+      height: 30px;
+      color: $white;
+      font-size: 15px;
+      max-height: 100%;
+      &::placeholder {
+        color: $neutral-650;
+      }
+    }
+
+    p {
+      font-size: 13px;
+      color: $neutral-600;
+      color: $white;
+    }
+  }
+}
+
+.c-textarea {
+  @include flex(row);
+  width: 100%;
+  border-radius: 10px;
+  background: $neutral-80;
+  border: 1px solid $neutral-200;
+
+  &__icon {
+    @include flex(row, center, center);
+    color: $primary;
+  }
+
+  textarea {
+    width: 100%;
+    height: 70px;
+    padding: 12px;
+    color: $white;
+    min-width: 100%;
+    max-width: 100%;
+    font-size: 14px;
+    line-height: 1.4;
+    min-height: 60px;
+    max-height: 100px;
+    &::placeholder {
+      color: $neutral-650;
+    }
+  }
+}
+
+.add-image-btn {
+  @include flex(row, center, center);
+  right: 0px;
+  bottom: 0px;
+  padding: 2px 2px;
+  position: absolute;
+}
+
+.c-img-input {
+  @include flex(column, center, center);
+  width: 100%;
+  // margin-bottom: 10px;
+
+  .image-file-input {
+    display: none;
+  }
+
+  &__overlay {
+    @include flex(column, center, center);
+    display: none;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+
+    button {
+      @include flex(row, center, center);
+      width: 46px;
+      aspect-ratio: 1;
+      cursor: pointer;
+      border-radius: 100%;
+      backdrop-filter: blur(4px);
+      background-color: rgba(15, 20, 25, 0.5);
+    }
+  }
+
+  &__preview {
+    @include flex(row, center, center);
+    height: 100px;
+    aspect-ratio: 1;
+    cursor: pointer;
+    // overflow: hidden;
+    position: relative;
+    border-radius: 100%;
+    background: $neutral-100;
+    // border: 1px solid $neutral-200;
+
+    &.sm {
+      height: 60px;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 100%;
+    }
+  }
+}
+
+.base-input {
+  @include flex(row);
+  width: 100%;
+  padding: 0px 8px;
+  border-radius: 10px;
+  border: 2px solid $neutral-100;
+
+  &.horPad {
+    padding: 0px 14px;
+  }
+
+  &.bgColor {
+    background: $neutral-80;
+  }
+
+  &--icon {
+    @include flex(row, center, center);
+    width: 24px;
+    color: $white;
+    font-size: 12px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba($color: $primary, $alpha: 0.08);
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 100%;
+    }
+  }
+
+  .max-btn {
+    @include flex(row, center, center);
+    color: $white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: $neutral-150;
+  }
+
+  &__block {
+    @include flex(column, flex-start, flex-start, 4px);
+    flex: 1;
+    padding: 4px 0px;
+
+    &.padded {
+      gap: 0px;
+      padding: 4px 0px 8px;
+    }
+
+    input {
+      width: 100%;
+      height: 30px;
+      color: $white;
+      font-size: 15px;
+      max-height: 100%;
+
+      &.v-line-left {
+        padding-left: 10px;
+        border-left: 2px solid #313131;
+      }
+    }
+
+    p {
+      font-size: 13px;
+      color: $neutral-600;
+      color: $white;
+    }
+  }
+}

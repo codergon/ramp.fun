@@ -1,0 +1,12 @@
+.c-wallet-icon {
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  background: white;
+
+  img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+  }
+}

@@ -1,0 +1,29 @@
+.c-topbar {
+  width: 100%;
+  font-size: 14px;
+  height: $topbar-h;
+  border-bottom: $border-1;
+  padding: 0px min(5vw, 30px);
+  @include flex(row, space-between, center);
+
+  &__connect {
+    @include flex(row);
+  }
+
+  &__btns {
+    @include flex(row);
+    gap: 6px;
+
+    .c-topbar__btn {
+      @include flex(row);
+      gap: 6px;
+      cursor: pointer;
+      padding: 7px 10px;
+      border-radius: 6px;
+
+      &:hover {
+        background: $neutral-100;
+      }
+    }
+  }
+}

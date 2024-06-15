@@ -1,0 +1,18 @@
+@function z($name) {
+  @if index($z-indexes, $name) {
+    @return (length($z-indexes) - index($z-indexes, $name)) + 1;
+  } @else {
+    @warn 'There is no item "#{$name}" in this list; Choose one of: #{$z-indexes}';
+
+    @return null;
+  }
+}
+
+@function toRem($value) {
+  $remValue: calc($value / $base-font) + rem;
+  @return $remValue;
+}
+
+@function border($width: 1px, $color: $border-1, $style: solid) {
+  @return $width $style $color;
+}

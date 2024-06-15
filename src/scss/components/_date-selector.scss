@@ -1,0 +1,33 @@
+.date-display {
+  @include flex(row, space-between, center);
+  // flex: 1;
+  cursor: pointer;
+  padding: 2px 14px;
+  padding-right: 10px;
+  border-radius: 10px;
+  border: 2px solid $neutral-100;
+
+  &__text {
+    @include flex(row, space-between, center);
+    color: $white;
+    height: 38px;
+    font-size: 15px;
+    p {
+      color: $neutral-900;
+    }
+  }
+
+  &__icon {
+    @include flex(row, center, center);
+    height: 30px;
+    color: $white;
+    padding: 0px 4px;
+    border-radius: 4px;
+  }
+
+  @include phone {
+    &__text {
+      font-size: 12px;
+    }
+  }
+}

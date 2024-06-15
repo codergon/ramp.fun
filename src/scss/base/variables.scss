@@ -1,0 +1,88 @@
+$grey: #999;
+$white: #fff;
+$white-pure: #fff;
+$black: #000010;
+$background: #111;
+
+$primary: #bfea88;
+$primary: #4ae683;
+$primary: #ee6f61;
+$secondary: #cfdddb;
+$tab-bg: #111;
+
+$preview-bg: #efefef;
+
+$g-1: #099b63;
+
+$buy-color: #0ecb81;
+$sell-color: #ca3f64;
+
+$neutral-50: #080808;
+$neutral-80: #1a1a1a;
+$neutral-90: #1d1d1d;
+$neutral-95: #212121;
+$neutral-100: #242424;
+$neutral-120: #282828;
+$neutral-150: #2a2a2a;
+$neutral-200: #333;
+$neutral-250: #2d2d2d;
+$neutral-300: #444;
+$neutral-600: #666;
+$neutral-650: #6d6d6d;
+$neutral-700: #777;
+$neutral-800: #888;
+$neutral-900: #999;
+
+$positive-100: #29342f;
+$positive-200: #2d4435;
+$positive-300: #256f44;
+$positive-400: #31b566;
+$positive-500: #4fbf67;
+$negative-100: #382328;
+$negative-200: #4e272a;
+$negative-300: #8a393b;
+$negative-400: #e85555;
+$negative-500: #ff5c5c;
+$notice-100: #352b1e;
+$notice-200: #4e371b;
+$notice-300: #8a5a1b;
+$notice-400: #d0821c;
+$notice-500: #ff9d1c;
+$notice-600: #feb85b;
+
+$gray-100: #aaa;
+
+$light-100: #eee;
+$light-200: #f8f8f8;
+$light-300: #fafafa;
+
+$border-0: 1px solid #000;
+$border-1: 1px solid #222;
+$border-2: 1px solid #222;
+$border-28: 1px solid #282828;
+$border-2d: 1px solid #2d2d2d;
+$border-3: 1px solid #333;
+
+// dimensions
+$base-font: 15;
+$modal-width: 480px;
+$navbar-height: 50px;
+
+$topbar-h: 64px;
+
+$spacing: 1rem;
+$pad_hor: min(5vw, 20px);
+
+// fonts
+$sans: Neue, sans-serif;
+
+// z-indexes
+$z-indexes: (
+  "preloader",
+  "loader",
+  "modal",
+  "overlay",
+  "navbar",
+  "menu",
+  "content"
+);

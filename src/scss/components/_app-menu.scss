@@ -1,0 +1,102 @@
+.app-menu__container {
+  z-index: 999;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  .szh-menu-container {
+    width: 100%;
+  }
+}
+.app-menu {
+  width: 100%;
+  display: flex;
+  min-width: 126px;
+  flex-direction: column;
+  padding: 7px !important;
+  max-width: 100% !important;
+  margin-top: 4px !important;
+  border-radius: 8px !important;
+  background-color: $neutral-90 !important;
+  border: 1px solid $neutral-150 !important;
+  box-shadow: 0px 0.5px 1px 0px #000000cc !important;
+
+  &.date-menu {
+    min-width: 200px;
+    padding: 8px 10px !important;
+  }
+
+  &.chain-menu {
+    min-width: 200px;
+  }
+
+  &.wallet {
+    padding: 2px !important;
+    margin-top: 6px !important;
+    .menu-item {
+      padding: 10px;
+      font-size: 13px;
+    }
+  }
+
+  .menu-item {
+    gap: 12px;
+    border: none;
+    outline: none;
+    display: flex;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    text-align: center;
+    color: $neutral-700;
+    text-transform: capitalize;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid $neutral-150;
+    }
+
+    @include flex(row);
+
+    &:hover {
+      color: rgba($color: $white, $alpha: 0.6);
+      background-color: rgba($color: $white, $alpha: 0.06);
+    }
+    &[data-active="true"] {
+      color: $white;
+    }
+    svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--body-text);
+      &.play {
+        fill: none;
+        stroke: var(--body-text);
+      }
+    }
+
+    &.delete,
+    &.unsubscribe {
+      color: $negative-500;
+      // background: rgba($color: $negative-500, $alpha: 0.04);
+    }
+  }
+}
+
+.rdp {
+  margin: 0px !important;
+}
+
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: $neutral-250 !important;
+}
+
+.rdp-day_selected,
+.rdp-day_selected:focus-visible,
+.rdp-day_selected:hover {
+  background-color: #ee6f61 !important;
+}
+
+.szh-accordion__item-content {
+  width: 100%;
+  height: auto;
+}
