@@ -7,13 +7,69 @@
   padding: 0px $padHor;
   border-bottom: $border-1;
 
+  .time-display {
+    font-size: 15px;
+    line-height: 1;
+
+    background: linear-gradient(10deg, pink, orange, pink, violet, red);
+    background-clip: text;
+    color: transparent;
+  }
+
+  &__logo {
+    @include flex(row, flex-start, center, 2px);
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 1px;
+
+    .icon {
+      @include flex(row, center, center, 0px);
+      margin-bottom: -5px;
+      transform: rotateZ(23deg);
+      svg path {
+        stroke: $white;
+        stroke-width: 3px;
+      }
+    }
+  }
+
   &__connect {
     @include flex(row);
   }
 
-  &__btns {
-    @include flex(row);
-    gap: 6px;
+  &__block {
+    @include flex(row, flex-start, center, 20px);
+    font-size: 15px;
+
+    .divider {
+      width: 2px;
+      height: 20px;
+      background: $neutral-300;
+    }
+
+    a {
+      @include flex(row, flex-start, center, 2px);
+      font-size: 14px;
+      border-bottom: 1px solid $white;
+      p {
+        line-height: 1;
+      }
+    }
+
+    .acct-display {
+      @include flex(row, flex-start, center, 8px);
+      cursor: pointer;
+      p {
+        line-height: 1;
+      }
+      img {
+        width: 22px;
+        height: 22px;
+        object-fit: cover;
+        border-radius: 100%;
+        border: 1px solid $neutral-300;
+      }
+    }
 
     .c-topbar__btn {
       @include flex(row);

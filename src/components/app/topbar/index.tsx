@@ -1,34 +1,76 @@
 import "./topbar.scss";
-import { useModal } from "contexts";
-import { Eye, GasPump, Plus } from "@phosphor-icons/react";
 import dayjs from "dayjs";
+import { truncate } from "utils/HelperUtils";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import WalletIcon from "components/common/wallet-icon";
+import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
+import { ArrowUpRight, Eye, WaveSine } from "@phosphor-icons/react";
 
 const Topbar = () => {
-  [];
+  const { open } = useWeb3Modal();
+  const { address } = useAccount();
+  const { data: ens } = useEnsName({
+    address,
+    query: { enabled: !!address },
+  });
+  const { data: avatar } = useEnsAvatar({
+    name: ens!,
+    query: { enabled: !!ens },
+  });
+
+  console.log(avatar);
 
   return (
     <div className="c-topbar">
-      <div className="c-topbar__connect">
-        {/* <div className="c-button c-button--border c-button--rounded">
-          Connect wallet
-        </div> */}
-        <w3m-account-button />
+      <div className="c-topbar__logo">
+        ramp.fun
+        <div className="icon">
+          <WaveSine size={28} weight="bold" mirrored />
+        </div>
       </div>
 
-      <div className="c-topbar__btns">
-        <p>
-          {dayjs()
-            .tz("America/New_York")
-            .format("dddd, MMMM D, [New York,] HH:mm")}
-        </p>
-        <div className="gas-price c-topbar__btn">
-          <GasPump size={18} weight="fill" />
-          <p>24 GWEI</p>
-        </div>
+      {/* <p className="time-display">
+        {dayjs()
+          .tz("America/New_York")
+          .format("dddd, MMM D, [New York,] HH:mm")}
+      </p> */}
+      {/* <SearchbarWithShortcut /> */}
 
-        {/* <div className="gas-price c-topbar__btn">
+      <div className="c-topbar__block">
+        {address ? (
+          <div className="acct-display">
+            {!!avatar ? (
+              <img src={avatar} alt="avatar" />
+            ) : (
+              <WalletIcon size={22} address={`0x`} />
+            )}
+            <p>{ens || truncate(address)}</p>
+          </div>
+        ) : (
+          <div className="acct-display" onClick={() => open()}>
+            <p>[Connect Wallet]</p>
+          </div>
+        )}
+
+        <div className="divider" />
+
+        <p className="time-display">
+          {dayjs().tz("America/New_York").format("[New York,] HH:mm")}
+        </p>
+
+        <a target="_blank" href="https://twitter.com/thealpha_knight">
+          <p>TW</p>
+          <ArrowUpRight size={14} weight="bold" />
+        </a>
+
+        <a target="_blank" href="https://github.com/codergon">
+          <p>GH</p>
+          <ArrowUpRight size={14} weight="bold" />
+        </a>
+
+        <div className="gas-price c-topbar__btn">
           <Eye size={18} weight="bold" />
-        </div> */}
+        </div>
       </div>
     </div>
   );

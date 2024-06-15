@@ -1,11 +1,7 @@
 import "./home.scss";
 import SearchbarWithShortcut from "components/common/searchBarWithShortcut";
 
-import {
-  ArrowLeft,
-  ArrowRight,
-  ArrowBendDoubleUpRight,
-} from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, CaretDoubleRight } from "@phosphor-icons/react";
 
 const Home = () => {
   return (
@@ -21,10 +17,10 @@ const Home = () => {
 
         <div className="create-token-btn">
           <p>Launch a new token</p>
-          <ArrowBendDoubleUpRight
+          <CaretDoubleRight
             size={20}
             weight="bold"
-            style={{ marginTop: "4px" }}
+            // style={{ marginTop: "4px" }}
           />
         </div>
       </div>

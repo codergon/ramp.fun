@@ -30,8 +30,9 @@
     @include flex(row, center, center, 0px);
     height: 22px;
     font-size: 10px;
+    color: $primary;
+    font-weight: 600;
     padding: 0px 8px;
-    color: $light-300;
     border-radius: 6px;
     text-transform: uppercase;
     background: rgba($color: #fff, $alpha: 0.1);
