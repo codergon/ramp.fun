@@ -22,6 +22,10 @@ $neutral-50: #080808;
 $neutral-80: #1a1a1a;
 $neutral-90: #1d1d1d;
 $neutral-95: #212121;
+
+$neutral-1b0: #1b1b1b;
+$neutral-180: #181818;
+
 $neutral-100: #242424;
 $neutral-120: #282828;
 $neutral-150: #2a2a2a;
@@ -54,8 +58,9 @@ $notice-600: #feb85b;
 
 $gray-100: #aaa;
 
-$light-100: #eee;
+$light-100: #ccc;
 $light-200: #f8f8f8;
+$light-300: #fafafa;
 $light-300: #fafafa;
 
 $border-0: 1px solid #000;
@@ -73,7 +78,7 @@ $navbar-height: 50px;
 $topbar-h: 64px;
 
 $spacing: 1rem;
-$pad_hor: min(5vw, 20px);
+$padHor: min(5vw, 30px);
 
 // fonts
 $sans: Neue, sans-serif;

@@ -3,88 +3,151 @@
   width: 100%;
   padding-bottom: 10vh;
 
-  .tokens-grid {
+  // HEADER SECTION
+  .home-header {
+    @include flex(column, center, center, 34px);
+    width: 100%;
+    padding-left: $padHor;
+    padding-right: $padHor;
+    padding-top: clamp(14vh, 12vw, 150px);
+    padding-bottom: clamp(40px, 5vw, 86px);
+
+    &__main {
+      color: $white;
+      // max-width: 70%;
+      font-weight: 500;
+      line-height: 100%;
+      text-align: center;
+      font-size: clamp(44px, -6.6px + 9.7vw, 120px);
+    }
+
+    .create-token-btn {
+      @include flex(row, flex-start, flex-start, 12px);
+      flex: none;
+      cursor: pointer;
+      overflow: hidden;
+      color: $background;
+      background: $white;
+      padding: 14px 26px;
+      border-radius: 16px;
+      border: 1px solid #222;
+    }
+  }
+
+  // TOKENS
+  .tokens-list {
     $col: 4;
     $gap: 10px;
 
-    @include flex(row, flex-start, flex-start, $gap);
-    width: 100%;
-    flex-wrap: wrap;
+    @include flex_col(30px);
     margin: 70px 0px;
     padding: 1px $gap;
-    // background: #282828;
 
-    .token {
-      @include flex_col(20px);
-      width: calc((100% / #{$col}) - ($gap * ((#{$col} - 1) /#{$col})));
-      padding: 10px 14px 24px;
-      border-radius: 10px;
-      background: #181818;
+    .tokens-topbar {
+      @include flex(row, space-between, center);
+      width: 100%;
+      padding: 0px $gap;
 
-      &-image {
-        width: 80px;
-        height: 80px;
+      .nav {
+        @include flex(row, flex-start, center);
+        gap: 20px;
 
-        // width: 100%;
-        // height: 180px;
+        .nav-btn {
+          @include flex(row, center, center);
+          gap: 10px;
+          width: 40px;
+          cursor: pointer;
+          aspect-ratio: 1/1;
+          border-radius: 50%;
+          color: $neutral-200;
+          border: 1px solid $neutral-200;
 
-        overflow: hidden;
-        border-radius: 8px;
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
+          &[data-active="true"] {
+            color: $light-100;
+            border-color: $light-100;
+          }
         }
       }
+    }
 
-      &-details {
-        @include flex(column, space-between, flex-start, 10px);
-        width: 100%;
-        font-size: 14px;
+    .tokens-grid {
+      @include flex(row, flex-start, flex-start, $gap);
+      width: 100%;
+      flex-wrap: wrap;
 
-        &--info {
-          @include flex_col(6px);
+      .token {
+        @include flex_col(20px);
+        border-radius: 10px;
+        padding: 10px 14px 24px;
+        background: $neutral-180;
+        width: calc((100% / #{$col}) - ($gap * ((#{$col} - 1) /#{$col})));
 
-          .stats {
-            @include flex(row, flex-start, flex-start, 14px);
+        &-image {
+          width: 80px;
+          height: 80px;
+
+          // width: 100%;
+          // height: 180px;
+
+          overflow: hidden;
+          border-radius: 8px;
+          img {
             width: 100%;
-            margin-bottom: 4px;
-            color: $neutral-700;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
 
-            .stat {
-              @include flex(row, flex-start, flex-start, 6px);
-              font-weight: 500;
+        &-details {
+          @include flex(column, space-between, flex-start, 10px);
+          width: 100%;
+          font-size: 14px;
 
-              .label {
-                color: rgba($color: $primary, $alpha: 0.7);
-                color: $neutral-800;
-              }
-              .value {
-                color: $secondary;
-                &.market-cap {
-                  color: $positive-600;
+          &--info {
+            @include flex_col(6px);
+
+            .stats {
+              @include flex(row, flex-start, flex-start, 14px);
+              width: 100%;
+              margin-bottom: 4px;
+              color: $neutral-700;
+
+              .stat {
+                @include flex(row, flex-start, flex-start, 6px);
+                font-weight: 500;
+
+                .label {
+                  color: rgba($color: $primary, $alpha: 0.7);
+                  color: $neutral-800;
+                }
+                .value {
+                  color: $secondary;
+                  &.market-cap {
+                    color: $positive-600;
+                  }
                 }
               }
             }
-          }
 
-          .name {
-            color: $primary;
-            font-weight: 500;
-          }
-          .description {
-            font-weight: 400;
-            color: $neutral-900;
+            .name {
+              color: $primary;
+              font-weight: 500;
+            }
+            .description {
+              font-weight: 400;
+              color: $neutral-900;
+            }
           }
         }
-      }
 
-      &.load-more {
-        background: $primary;
+        &.load-more {
+          background: $primary;
+        }
       }
     }
   }
 
+  // TRENDING
   .trending {
     @include flex_col(20px);
     width: 100%;
@@ -107,8 +170,8 @@
           overflow: hidden;
           padding: 16px 24px;
           border-radius: 20px;
-          background: #1b1b1b;
-          border: 1px solid #2d2d2d;
+          background: $neutral-180;
+          border: 1px solid #222;
 
           img {
             width: 24px;

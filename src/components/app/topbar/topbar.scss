@@ -4,8 +4,8 @@
   width: 100%;
   font-size: 14px;
   height: $topbar-h;
+  padding: 0px $padHor;
   border-bottom: $border-1;
-  padding: 0px min(5vw, 30px);
 
   &__connect {
     @include flex(row);

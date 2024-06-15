@@ -15,10 +15,10 @@ const Searchbar = ({
   value,
   gap = 10,
   onChange,
-  height = 34,
+  height = 44,
   placeholder,
   iconSize = 16,
-  maxWidth = 320,
+  maxWidth = 420,
   borderWeight = 1,
 }: SearchbarProps) => {
   return (
@@ -38,7 +38,7 @@ const Searchbar = ({
         type="text"
         value={value}
         onChange={onChange && ((e) => onChange(e.target.value))}
-        placeholder={placeholder || "Search for collections, items and more"}
+        placeholder={placeholder || "Search for tokens, creator and more"}
       />
     </div>
   );
