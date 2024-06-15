@@ -44,14 +44,18 @@
     $col: 4;
     $gap: 10px;
 
-    @include flex_col(30px);
+    @include flex_col(20px);
     margin: 70px 0px;
     padding: 1px $gap;
 
     .tokens-topbar {
       @include flex(row, space-between, center);
+      top: 0px;
+      bottom: 0px;
       width: 100%;
-      padding: 0px $gap;
+      position: sticky;
+      padding: 14px $gap;
+      background: $background;
 
       .nav {
         @include flex(row, flex-start, center);
