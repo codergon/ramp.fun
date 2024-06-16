@@ -6,13 +6,14 @@
   .large-footer-text {
     @include flex(row, center, center);
     width: 96%;
-    padding-top: 7vh;
+    padding-top: 8vh;
 
     svg {
       width: 2500px;
       max-width: 100%;
       path {
         fill: #444;
+        // transform: translateY(30%);
       }
     }
   }

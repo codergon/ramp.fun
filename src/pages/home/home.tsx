@@ -44,7 +44,7 @@ const Home = () => {
               .fill(0)
               .map((token, index) => {
                 return (
-                  <div key={index} className="token">
+                  <NavLink key={index} className="token" to={`/hbjhhj`}>
                     <div className="token-image">
                       <img
                         src={`./assets/images/${((index + 1) % 6) + 1}.jpg`}
@@ -75,18 +75,9 @@ const Home = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* <div className="token-image">
-                  <img
-                    src={`./assets/images/${((index + 1) % 6) + 1}.jpg`}
-                    alt=""
-                  />
-                </div> */}
-                  </div>
+                  </NavLink>
                 );
               })}
-
-            {/* <div className="token load-more"></div> */}
           </div>
         </div>
       </div>
