@@ -22,22 +22,6 @@ html {
   @include desktop {
     font-size: 16px;
   }
-
-  @include tablet {
-    overflow: hidden;
-    body {
-      top: 0;
-      left: 0;
-      position: fixed;
-      overflow-y: hidden;
-      border-radius: 0px;
-      background: $tab-bg;
-      padding-bottom: 10px;
-      overscroll-behavior: none;
-    }
-  }
-
-  touch-action: none;
 }
 
 body {

@@ -4,8 +4,8 @@
   overflow: hidden;
   padding: 0px 12px;
   border-radius: 10px;
-  background: $neutral-80;
-  border: 2px solid $neutral-150;
+  // background: $neutral-80;
+  border: 1.8px solid $neutral-150;
 
   &__icon {
     @include flex(row, center, center);
@@ -52,7 +52,7 @@
   @include flex(row);
   width: 100%;
   border-radius: 10px;
-  background: $neutral-80;
+  // background: $neutral-80;
   border: 1px solid $neutral-200;
 
   &__icon {

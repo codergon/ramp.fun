@@ -1,0 +1,19 @@
+.c-footer {
+  @include flex(column, flex-end, center, 10px);
+  flex: none;
+  width: 100%;
+
+  .large-footer-text {
+    @include flex(row, center, center);
+    width: 96%;
+    padding-top: 7vh;
+
+    svg {
+      width: 2500px;
+      max-width: 100%;
+      path {
+        fill: #444;
+      }
+    }
+  }
+}

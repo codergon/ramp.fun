@@ -1,7 +1,10 @@
 .home {
   @include flex_col(3vh);
   width: 100%;
-  padding-bottom: 10vh;
+
+  @include tablet {
+    gap: 1.5vh;
+  }
 
   // HEADER SECTION
   .home-header {
@@ -10,16 +13,15 @@
     padding-left: $padHor;
     padding-right: $padHor;
     padding-top: clamp(14vh, 12vw, 150px);
-    padding-bottom: clamp(40px, 5vw, 86px);
+    padding-bottom: clamp(0px, 5vw, 86px);
 
     &__main {
       color: $white;
       color: $white;
-      // max-width: 70%;
       font-weight: 500;
       line-height: 100%;
       text-align: center;
-      font-size: clamp(44px, -6.6px + 9.7vw, 120px);
+      font-size: clamp(38px, -6.6px + 9.7vw, 120px);
     }
 
     .create-token-btn {
@@ -50,9 +52,9 @@
 
     .tokens-topbar {
       @include flex(row, space-between, center);
-      top: 0px;
       bottom: 0px;
       width: 100%;
+      top: $trendbar-h;
       position: sticky;
       padding: 14px $gap;
       background: $background;
@@ -86,6 +88,7 @@
 
       .token {
         @include flex_col(20px);
+        overflow: hidden;
         border-radius: 10px;
         padding: 10px 14px 24px;
         background: $neutral-180;
@@ -94,10 +97,6 @@
         &-image {
           width: 80px;
           height: 80px;
-
-          // width: 100%;
-          // height: 180px;
-
           overflow: hidden;
           border-radius: 8px;
           img {
@@ -156,46 +155,48 @@
         }
       }
     }
-  }
 
-  // TRENDING
-  .trending {
-    @include flex_col(20px);
-    width: 100%;
-    height: 100%;
-    margin: 40px 0px 70px;
-    padding: 1px 0px;
+    // RESPONSIVE
+    @include desktopSm {
+      $col: 3;
+      $gap: 10px;
 
-    .trending-projects {
-      @include flex(row, flex-start, flex-start, 24px);
-      width: 100%;
-      overflow: hidden;
+      .tokens-grid {
+        .token {
+          width: calc((100% / #{$col}) - ($gap * ((#{$col} - 1) /#{$col})));
+        }
+      }
+    }
 
-      &--inner {
-        @include flex(row, flex-start, flex-start, 20px);
+    @include laptop {
+      $col: 2;
+      $gap: 10px;
 
-        .project {
-          @include flex(row, flex-start, flex-start, 12px);
+      .tokens-grid {
+        .token {
+          width: calc((100% / #{$col}) - ($gap * ((#{$col} - 1) /#{$col})));
+        }
+      }
+    }
+
+    @include tabletSm {
+      margin: 50px 0px 20px;
+
+      .tokens-topbar {
+        gap: 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        .search-bar {
           flex: none;
-          color: $white;
-          font-weight: 400;
-          overflow: hidden;
-          padding: 16px 24px;
-          border-radius: 20px;
-          background: $neutral-180;
-          border: 1px solid #222;
-
-          img {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-          }
+          width: 100%;
+          max-width: 100% !important;
         }
       }
 
-      &--row2 {
-        .trending-projects--inner {
-          margin-left: -120px;
+      .tokens-grid {
+        flex-direction: column;
+        .token {
+          width: 100%;
         }
       }
     }

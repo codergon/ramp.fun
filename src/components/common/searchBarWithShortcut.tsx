@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MagnifyingGlass } from "@phosphor-icons/react";
+import { isMobile } from "react-device-detect";
 
 interface SearchbarProps {
   gap?: number;
@@ -63,9 +64,11 @@ const SearchbarWithShortcut = ({
         placeholder={placeholder || "Search for tokens, creators and more"}
       />
 
-      <div className="search-bar__shortcut">
-        {!focused ? <span>/</span> : <span>ESC</span>}
-      </div>
+      {!isMobile && (
+        <div className="search-bar__shortcut">
+          {!focused ? <span>/</span> : <span>ESC</span>}
+        </div>
+      )}
     </div>
   );
 };

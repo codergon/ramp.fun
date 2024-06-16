@@ -4,6 +4,7 @@ import Topbar from "components/app/topbar";
 import BaseToast from "components/app/base-toast";
 
 import Home from "pages/home/home";
+import CreateToken from "pages/create-token/create-token";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
 
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/create-token" element={<CreateToken />} />
             </Routes>
           </div>
         </div>

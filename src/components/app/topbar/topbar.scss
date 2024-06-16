@@ -1,10 +1,55 @@
+// TRENDING
+.trending {
+  @include flex(row, flex-start, center, 0px);
+  top: 0;
+  left: 0;
+  flex: none;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+  z-index: 99 * 999;
+  height: $trendbar-h;
+  background: $secondary;
+
+  .trending-projects {
+    @include flex(row, flex-start, flex-start, 24px);
+    width: 100%;
+    overflow: hidden;
+
+    &--inner {
+      @include flex(row, flex-start, flex-start, 20px);
+
+      .project {
+        @include flex(row, flex-start, center, 5px);
+        flex: none;
+        color: $black;
+        font-size: 14px;
+        font-weight: 500;
+        overflow: hidden;
+        padding: 0px 5px;
+        text-transform: uppercase;
+
+        img {
+          width: 20px;
+          height: 20px;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+}
+
+// TOPBAR
 .c-topbar {
   @include flex(row, space-between, center);
   flex: none;
   width: 100%;
   font-size: 14px;
+  overflow: hidden;
   height: $topbar-h;
   padding: 0px $padHor;
+  margin-top: $trendbar-h;
   border-bottom: $border-1;
 
   .time-display {

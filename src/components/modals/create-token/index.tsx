@@ -41,10 +41,7 @@ const CreateTokenModal = () => {
             }
           }}
         >
-          <img
-            alt="preview"
-            src={preview || "./assets/images/illustrations/1.webp"}
-          />
+          <img alt="preview" src={preview || "./assets/images/1.webp"} />
           <input
             type="file"
             ref={imageRef}

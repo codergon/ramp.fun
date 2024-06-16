@@ -23,7 +23,7 @@
   gap: 16px;
   flex: none;
   // min-height: 40px;
-  color: $white;
+  color: $black;
   line-height: 1;
   cursor: pointer;
   min-width: 84px;
@@ -70,6 +70,7 @@
   background: $primary;
 
   color: $white;
+  color: $black;
 
   &.disabled {
     opacity: 0.7;
