@@ -26,7 +26,7 @@ export default defineConfig({
         theme_color: "#111",
         orientation: "portrait",
         background_color: "#111",
-        description: "Ramp.fun - Buy and create tokens",
+        description: "Ramp.fun - Free presale Rekt? Not on our watch!",
 
         icons: [
           {
