@@ -1,9 +1,10 @@
 import "./create-token.scss";
 
-import useAppObjMenu from "hooks/useAppObjMenu";
-import { CameraPlus, CaretDoubleRight } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
 import { ClipLoader } from "react-spinners";
+import useAppObjMenu from "hooks/useAppObjMenu";
+import { useEffect, useRef, useState } from "react";
+import { Accordion, AccordionItem } from "@szhsin/react-accordion";
+import { CameraPlus, CaretDoubleRight, CaretUp } from "@phosphor-icons/react";
 
 const CreateToken = () => {
   const [name, setName] = useState("");
@@ -50,7 +51,7 @@ const CreateToken = () => {
 
       <div className="createToken__form">
         <div className="createToken__form--inner">
-          {/* IMAGE SELECTIOn */}
+          {/* IMAGE SELECTION */}
           <div className="c-img-input">
             <div
               className="c-img-input__preview"
@@ -122,38 +123,54 @@ const CreateToken = () => {
               />
             </div>
 
-            <div className="c-input">
-              <div className="c-input__block">
-                <input
-                  maxLength={32}
-                  value={twitter}
-                  placeholder="Twitter link (optional)"
-                  onChange={(e) => setTwitter(e.target.value)}
-                />
-              </div>
-            </div>
+            <Accordion>
+              <AccordionItem
+                header={({ state }) => (
+                  <div className="optional-accordion">
+                    <p>More options</p>
 
-            <div className="c-input">
-              <div className="c-input__block">
-                <input
-                  maxLength={32}
-                  value={telegram}
-                  placeholder="Telegram link (optional)"
-                  onChange={(e) => setTelegram(e.target.value)}
-                />
-              </div>
-            </div>
+                    <div className="bttn chevron" data-closed={!state.isEnter}>
+                      <CaretUp size={15} weight="bold" />
+                    </div>
+                  </div>
+                )}
+              >
+                <>
+                  <div className="c-input">
+                    <div className="c-input__block">
+                      <input
+                        maxLength={32}
+                        value={twitter}
+                        placeholder="Twitter link (optional)"
+                        onChange={(e) => setTwitter(e.target.value)}
+                      />
+                    </div>
+                  </div>
 
-            <div className="c-input">
-              <div className="c-input__block">
-                <input
-                  maxLength={32}
-                  value={website}
-                  placeholder="Website (optional)"
-                  onChange={(e) => setWebsite(e.target.value)}
-                />
-              </div>
-            </div>
+                  <div className="c-input">
+                    <div className="c-input__block">
+                      <input
+                        maxLength={32}
+                        value={telegram}
+                        placeholder="Telegram link (optional)"
+                        onChange={(e) => setTelegram(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="c-input">
+                    <div className="c-input__block">
+                      <input
+                        maxLength={32}
+                        value={website}
+                        placeholder="Website (optional)"
+                        onChange={(e) => setWebsite(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </>
+              </AccordionItem>
+            </Accordion>
 
             <div
               className={`base-btn ${loading ? "disabled" : ""}`}

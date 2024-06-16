@@ -78,6 +78,35 @@
         flex: 1;
       }
 
+      .szh-accordion,
+      .szh-accordion__item-btn {
+        width: 100%;
+      }
+      .szh-accordion__item-panel {
+        @include flex(column, flex-start, flex-start, 12px);
+      }
+
+      .optional-accordion {
+        @include flex(row, space-between, center, 8px);
+        width: 100%;
+        font-size: 15px;
+        padding: 10px 0px;
+
+        .bttn {
+          @include flex();
+          padding: 4px;
+          color: $neutral-700;
+
+          &.chevron {
+            color: $white;
+            transition: transform 0.25s cubic-bezier(0, 0, 0, 1);
+            &[data-closed="true"] {
+              transform: rotate(180deg);
+            }
+          }
+        }
+      }
+
       .row-block {
         @include flex(row, flex-start, center, 4px);
         gap: 16px;
