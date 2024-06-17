@@ -123,7 +123,7 @@ const CreateToken = () => {
               />
             </div>
 
-            <Accordion>
+            <Accordion transition transitionTimeout={500}>
               <AccordionItem
                 header={({ state }) => (
                   <div className="optional-accordion">

@@ -87,7 +87,7 @@ const Topbar = () => {
                 <ArrowUpRight size={14} weight="bold" />
               </a>
 
-              <a target="_blank" href="https://github.com/codergon">
+              <a target="_blank" href="https://github.com/codergon/ramp.fun">
                 <p>GH</p>
                 <ArrowUpRight size={14} weight="bold" />
               </a>

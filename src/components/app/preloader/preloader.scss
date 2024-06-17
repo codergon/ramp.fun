@@ -1,0 +1,25 @@
+.preloader {
+  @include flex(row, center, center, 0);
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  background: $background;
+  z-index: 999999 * 99999 * 9;
+
+  .icons {
+    @include flex(row, center, center, 0);
+    position: relative;
+
+    .icon {
+      @include flex(row, center, center, 0);
+      //   opacity: 0;
+      width: 200px;
+      height: 200px;
+      font-size: 80px;
+      position: absolute;
+      background: $background;
+    }
+  }
+}

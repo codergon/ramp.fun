@@ -84,6 +84,13 @@
       }
       .szh-accordion__item-panel {
         @include flex(column, flex-start, flex-start, 12px);
+        padding-top: 10px;
+      }
+
+      $transitionTime: 0.5s;
+
+      .szh-accordion__item-content {
+        transition: height $transitionTime cubic-bezier(0, 0, 0, 1);
       }
 
       .optional-accordion {
@@ -99,9 +106,9 @@
 
           &.chevron {
             color: $white;
-            transition: transform 0.25s cubic-bezier(0, 0, 0, 1);
+            transition: transform $transitionTime cubic-bezier(0, 0, 0, 1);
             &[data-closed="true"] {
-              transform: rotate(180deg);
+              transform: rotate(-180deg);
             }
           }
         }

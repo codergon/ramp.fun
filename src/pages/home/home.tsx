@@ -11,7 +11,7 @@ const Home = () => {
       <div className="home">
         <div className="home-header">
           <h3 className="home-header__main">
-            Free presale Rekt? <br /> Not on our watch!⚡️🚔
+            Free presale Rekt? <br /> Not on our watch!⚡️
           </h3>
 
           <NavLink to={"/create-token"} className="create-token-btn">
