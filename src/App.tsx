@@ -13,7 +13,7 @@ import CreateToken from "pages/create-token/create-token";
 
 function App() {
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const mainRef = useRef<HTMLDivElement | null>(null);
 

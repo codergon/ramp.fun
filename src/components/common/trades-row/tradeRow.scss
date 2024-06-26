@@ -1,0 +1,47 @@
+.trade-row-wrapper {
+  background-color: #1c1c1c;
+  // margin-top: 60px;
+}
+.type-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.img-wrapper {
+  border-radius: 100%;
+  display: grid;
+  place-items: center;
+  padding: 7px;
+  background-color: #2c2c2c;
+}
+.type {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: flex-start;
+  .time {
+    color: #ababab;
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+.schwarzy {
+  color: #a3e3bf;
+  text-transform: capitalize;
+}
+.border-radius1 {
+  border-radius: 15px 0px 0px 15px;
+}
+.border-radius2 {
+  border-radius: 0px 15px 15px 0px;
+}
+
+td {
+  padding: 24px 24px;
+}
+
+td div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

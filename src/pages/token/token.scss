@@ -1,7 +1,384 @@
+$mobile: 680px;
+$tablet: 1030px;
+$desktop: 1024px;
+
 .token-page {
   @include flex_col(0px);
   width: 100%;
   align-items: center;
   padding: 30px $padHor;
   justify-content: center;
+}
+.token-page-wrapper {
+  width: 100%;
+  padding: 13px;
+}
+
+.section1 {
+  display: flex;
+
+  justify-content: space-between;
+  gap: 20px;
+}
+
+// .section1-left,
+// .section1-right {
+//   max-width: 612px;
+// }
+.section1-left,
+.section1-right {
+  display: flex;
+  flex-direction: column;
+  background-color: #121212;
+  gap: 30px;
+  padding: 36px;
+  border: 1px solid #181818;
+  border-radius: 40px;
+  max-width: 612px;
+  width: 100%;
+}
+
+.tokenImg {
+  max-width: 540px;
+  width: 100%;
+}
+
+.text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.text-wrapper h2 {
+  color: #ffffff;
+}
+.text-wrapper p {
+  color: #ababab;
+}
+.creator-details {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.creator-name,
+.creator-address {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.schwarzy {
+  color: #a3e3bf;
+  text-transform: capitalize;
+}
+
+.creator-address {
+  background-color: #1c1c1c;
+  border-radius: 10px;
+  padding: 10px 16px;
+}
+.section1-right {
+}
+
+.position {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.buy-sell-wrapper {
+  position: relative;
+  padding: 5px 8px;
+  background-color: #1c1c1c;
+  border-radius: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.buy,
+.sell {
+  padding: 10px 30px;
+}
+.activePosition {
+  background-color: black;
+  color: white;
+  border-radius: 10px;
+}
+
+.slippage {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.swap-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.from-token,
+.to-token {
+  background-color: #1c1c1c;
+  border-radius: 20px;
+  width: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  justify-content: center;
+}
+
+.from-token-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 15px 20px;
+  background-color: #202020;
+  border-radius: 15px;
+}
+
+.amount-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.amount-wrapper input {
+  font-size: 28px;
+  width: 100%;
+}
+.switch-token {
+  position: absolute;
+  background-color: #e4cce1;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+
+  padding: 10px 10px;
+  border-radius: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.wallet-bal-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+}
+
+.trade-btn {
+  width: 100%;
+  background-color: #e4cce1;
+  padding: 15px 12px;
+  text-align: center;
+  color: #111111;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.section2 {
+  background-color: #121212;
+  border: 1px solid #181818;
+  border-radius: 40px;
+  width: 100%;
+  max-height: 573px;
+  height: 100%;
+  margin-top: 60px;
+}
+
+.section3 {
+  margin-top: 100px;
+}
+
+.section3-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  div {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .next-btn {
+    transform: rotate(180deg);
+  }
+}
+
+.trades-table-wrapper {
+  width: 100%;
+  // margin-top: 20px;
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0px 25px;
+  }
+}
+
+.table-header {
+  background-color: #1c1c1c;
+  border-radius: 40px;
+  width: 100%;
+  th {
+    padding: 16px 24px;
+    text-align: left;
+  }
+
+  .border-radius1 {
+    border-radius: 15px 0px 0px 15px;
+  }
+  .border-radius2 {
+    border-radius: 0px 15px 15px 0px;
+  }
+}
+
+//Slippage settings styles
+
+.slippage-wrapper {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  background-color: #ffffff1e;
+  backdrop-filter: blur(4px);
+  top: 0;
+  left: 0;
+  padding: 20px;
+  .slippage-modal {
+    background-color: #111111;
+    padding: 56px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-width: 450px;
+    width: 100%;
+    border-radius: 30px;
+
+    .slippage-header {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      .settings {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        h2 {
+          font-size: 25px;
+          font-weight: 500;
+        }
+        button {
+          border-radius: 100%;
+          padding: 10px;
+          background-color: #2b2a2a;
+          display: grid;
+          place-items: center;
+        }
+      }
+      p {
+        color: #c3c3c3;
+      }
+    }
+  }
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.max-spillage-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  p {
+  }
+  .max-spillage {
+    width: 100%;
+    padding: 8px 10px;
+    background-color: #1d1d1d;
+    border-radius: 10px;
+
+    input {
+      border: 0px;
+      outline: none;
+      padding: 12px 7px;
+      width: 100%;
+    }
+  }
+}
+
+.priority-fee-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.priority-fee-input {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  padding: 8px 10px;
+  background-color: #1d1d1d;
+  border-radius: 10px;
+  div {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  input {
+    border: 0px;
+    outline: none;
+    padding: 12px 7px;
+    width: 100%;
+  }
+}
+.disclaimer {
+  color: #b4b4b4;
+}
+.save-settings {
+  background-color: #e4cce1;
+  color: black;
+  font-weight: 600;
+  width: 100%;
+  padding: 15px 10px;
+  border-radius: 10px;
+}
+
+//Media queries
+
+@media (max-width: $mobile) {
+  .section1 {
+    flex-wrap: wrap;
+    gap: 50px;
+  }
+
+  .amount-wrapper input {
+    // font-size: 16px;
+  }
+}
+
+@media (max-width: $tablet) {
+  .section1-left,
+  .section1-right {
+    padding: 30px;
+  }
+  .creator-details {
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+
+  .position {
+    // flex-direction: column;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .trades-table-wrapper {
+    overflow-x: auto;
+  }
 }
