@@ -5,7 +5,17 @@ import { ArrowLeft, ArrowRight, CaretDoubleRight } from "@phosphor-icons/react";
 import Footer from "components/app/footer";
 import SearchbarWithShortcut from "components/common/searchBarWithShortcut";
 
+import { useTokens } from "../../hooks/useToken";
+import { useAccount } from "wagmi";
+import { baseSepolia } from "viem/chains";
+import { truncate } from "utils/HelperUtils";
+import EmptyState from "../../components/common/empty-state";
+import { formatEther } from "viem";
+
 const Home = () => {
+  const { chainId } = useAccount();
+  const { tokens, loading, error} = useTokens(chainId ? chainId : baseSepolia.id, "timestamp", 10);
+
   return (
     <>
       <div className="home">
@@ -38,47 +48,49 @@ const Home = () => {
               </button>
             </div>
           </div>
+          {
+            loading 
+            ?
+            <EmptyState />
+            :
+            <div className="tokens-grid">
+              {tokens
+                .map((token, index) => {
+                  return (
+                    <NavLink key={index} className="token" to={`/${token.id}`}>
+                      <div className="token-image">
+                        <img
+                          src={`./assets/images/${((index + 1) % 6) + 1}.jpg`}
+                          alt=""
+                        />
+                      </div>
 
-          <div className="tokens-grid">
-            {Array(14)
-              .fill(0)
-              .map((token, index) => {
-                return (
-                  <NavLink key={index} className="token" to={`/hbjhhj`}>
-                    <div className="token-image">
-                      <img
-                        src={`./assets/images/${((index + 1) % 6) + 1}.jpg`}
-                        alt=""
-                      />
-                    </div>
+                      <div className="token-details">
+                        <div className="token-details--info">
+                          <div className="name">{token.name} (ticker: {token.symbol})</div>
 
-                    <div className="token-details">
-                      <div className="token-details--info">
-                        <div className="name">PepeBox (ticker: PEPEBOX)</div>
-
-                        <div className="stats">
-                          <div className="stat">
-                            <div className="label">market cap</div>
-                            <div className="value market-cap">23.4k</div>
+                          <div className="stats">
+                            <div className="stat">
+                              <div className="label">market cap</div>
+                              <div className="value market-cap">{formatEther(BigInt(token.marketCap))} ETH</div>
+                            </div>
+                            •
+                            <div className="stat">
+                              <div className="label">created by</div>
+                              <div className="value">{truncate(token.creator)}</div>
+                            </div>
                           </div>
-                          •
-                          <div className="stat">
-                            <div className="label">created by</div>
-                            <div className="value">Schwarzy</div>
-                          </div>
-                        </div>
 
-                        <div className="description">
-                          Pepe in a legendary boxing fight with where, these
-                          cryptos are very strong, the one who wins the fight
-                          for wins in solana.
+                          <div className="description">
+                            {token.description}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </NavLink>
-                );
-              })}
-          </div>
+                    </NavLink>
+                  );
+                })}
+            </div>
+          }
         </div>
       </div>
 

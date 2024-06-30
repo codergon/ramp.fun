@@ -1,6 +1,6 @@
-import { mainnet } from "wagmi/chains";
+import { baseSepolia, base } from "wagmi/chains";
 import { http, createConfig } from "wagmi";
-import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
+import { coinbaseWallet, metaMask, walletConnect } from "wagmi/connectors";
 
 const metadata = {
   name: "Ramp.fun",
@@ -10,18 +10,14 @@ const metadata = {
 };
 
 export const config = createConfig({
-  chains: [mainnet],
+  chains: [baseSepolia],
+  multiInjectedProviderDiscovery: false,
   connectors: [
-    injected(),
-    coinbaseWallet({ appName: "Create Wagmi" }),
-    walletConnect({
-      metadata,
-      showQrModal: false,
-      projectId: import.meta.env.VITE_WC_PROJECT_ID,
-    }),
+    coinbaseWallet({ appName: "Create Wagmi", preference: "all" }),
   ],
   transports: {
-    [mainnet.id]: http(),
+    [baseSepolia.id]: http(),
+    [base.id]: http()
   },
 });
 

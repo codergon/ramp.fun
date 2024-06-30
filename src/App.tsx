@@ -62,7 +62,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/create-token" element={<CreateToken />} />
-              <Route path="/:token" element={<TokenPage />} />
+              <Route path="/:tokenId" element={<TokenPage />} />
             </Routes>
           </div>
         </div>

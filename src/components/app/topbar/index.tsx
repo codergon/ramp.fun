@@ -78,9 +78,9 @@ const Topbar = () => {
             <>
               <div className="divider" />
 
-              <p className="time-display">
+              {/* <p className="time-display">
                 {dayjs().tz("America/New_York").format("[New York,] HH:mm")}
-              </p>
+              </p> */}
 
               <a target="_blank" href="https://twitter.com/thealpha_knight">
                 <p>TW</p>

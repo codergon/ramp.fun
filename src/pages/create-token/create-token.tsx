@@ -5,6 +5,8 @@ import useAppObjMenu from "hooks/useAppObjMenu";
 import { useEffect, useRef, useState } from "react";
 import { Accordion, AccordionItem } from "@szhsin/react-accordion";
 import { CameraPlus, CaretDoubleRight, CaretUp } from "@phosphor-icons/react";
+import { useWriteContract, useReadContract } from "wagmi";
+import { curveConfig } from "../../constants/data";
 
 const CreateToken = () => {
   const [name, setName] = useState("");
@@ -15,6 +17,12 @@ const CreateToken = () => {
   const [twitter, setTwitter] = useState("");
   const [website, setWebsite] = useState("");
   const [telegram, setTelegram] = useState("");
+
+  const { writeContract } = useWriteContract();
+  const creationFee = useReadContract({
+    ...curveConfig,
+    functionName: 'creationFee'
+  });
 
   const [TokenMenu, selectedToken] = useAppObjMenu({
     uppercase: true,
@@ -32,6 +40,27 @@ const CreateToken = () => {
     if (!e.target.files || e.target.files.length === 0) return;
     setSelectedFile(e.target.files[0]);
   };
+
+  const handleCreateToken = async () => {
+    if (name == "" || description == "" || ticker == "" || selectedFile == null) return
+    setLoading(true);
+    writeContract({
+      ...curveConfig,
+      functionName: 'launchToken',
+      // @ts-ignore
+      value: creationFee.data ? creationFee.data : BigInt(0),
+      args: [{
+        name,
+        description,
+        twitterLink: twitter,
+        telegramLink: telegram,
+        symbol: ticker,
+        website,
+        image: selectedFile.toString()
+      }],
+    })
+    setLoading(false);
+  }
 
   useEffect(() => {
     // create the preview
@@ -173,8 +202,8 @@ const CreateToken = () => {
             </Accordion>
 
             <div
-              className={`base-btn ${loading ? "disabled" : ""}`}
-              onClick={() => {}}
+              className={`base-btn ${loading || name == "" || description == "" || ticker == "" || selectedFile == null ? "disabled" : ""}`}
+              onClick={handleCreateToken}
             >
               <p>Create token</p>
 
