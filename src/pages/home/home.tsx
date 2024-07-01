@@ -7,14 +7,14 @@ import SearchbarWithShortcut from "components/common/searchBarWithShortcut";
 
 import { useTokens } from "../../hooks/useToken";
 import { useAccount } from "wagmi";
-import { baseSepolia } from "viem/chains";
+import { fraxtalTestnet } from "viem/chains";
 import { truncate } from "utils/HelperUtils";
 import EmptyState from "../../components/common/empty-state";
 import { formatEther } from "viem";
 
 const Home = () => {
   const { chainId } = useAccount();
-  const { tokens, loading, error} = useTokens(chainId ? chainId : baseSepolia.id, "timestamp", 10);
+  const { tokens, loading, error} = useTokens(chainId ? chainId : fraxtalTestnet.id, "timestamp", 10);
 
   return (
     <>
