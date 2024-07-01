@@ -170,7 +170,7 @@ const TokenPage = () => {
 
   const { writeContract } = useWriteContract();
 
-
+  
   const handleBuy = async () => {
     if (!token) {
       return

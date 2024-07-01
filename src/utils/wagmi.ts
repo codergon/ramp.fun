@@ -1,4 +1,4 @@
-import { baseSepolia, base } from "wagmi/chains";
+import { fraxtal, fraxtalTestnet } from "wagmi/chains";
 import { http, createConfig } from "wagmi";
 import { coinbaseWallet, metaMask, walletConnect } from "wagmi/connectors";
 
@@ -10,14 +10,13 @@ const metadata = {
 };
 
 export const config = createConfig({
-  chains: [baseSepolia],
-  multiInjectedProviderDiscovery: false,
+  chains: [fraxtal, fraxtalTestnet],
   connectors: [
-    coinbaseWallet({ appName: "Create Wagmi", preference: "all" }),
+    coinbaseWallet({ appName: "Create Wagmi", preference: "eoaOnly" }),
   ],
   transports: {
-    [baseSepolia.id]: http(),
-    [base.id]: http()
+    [fraxtal.id]: http(),
+    [fraxtalTestnet.id]: http()
   },
 });
 
