@@ -10,6 +10,9 @@ import { formatEther, parseEther } from "viem";
 import { useWriteContract, useClient, useBlock } from "wagmi";
 import { curveConfig, tokenConfig } from "../../constants/data";
 import { getBalance, multicall, readContract } from "viem/actions";
+import { add, set } from "lodash";
+import SuccessToast from "../../components/modals/success-toast/successToast";
+import FailedToasts from "../../components/modals/failed-toast/FailedToast";
 
 const trades = [
   {
@@ -106,59 +109,69 @@ const TokenPage = () => {
   const [buyActive, setBuyActive] = useState(true);
   const [sellActive, setSellActive] = useState(false);
   const [tokenPool, setTokenPool] = useState<TokenPool>();
-  const [tradeFeeParams, setTradeFeeParams] = useState<{rate: string; denom: string}>();
+  const [tradeFeeParams, setTradeFeeParams] = useState<{
+    rate: string;
+    denom: string;
+  }>();
   const [ethAmount, setEthAmount] = useState("0");
   const [tokenAmount, setTokenAmount] = useState("0");
   const [ethBalance, setEthBalance] = useState("0");
   const [tokenBalance, setTokenBalance] = useState("0");
   const [slippage, setSlippage] = useState("2");
+  const [showFailModal, setShowFailModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showSlippageModal, setShowSlippageModal] = useState(false);
-  const { token, loading, error} = useToken(tokenId ? tokenId : "");
+  const { token, loading, error } = useToken(tokenId ? tokenId : "");
+  const [disableBtn, setDisableBtn] = useState(false);
+
+  //conditionally render the estReceiveAmt
+  const [estRecieveAmt, setEstReceiveAmt] = useState("20");
+
   const client = useClient();
   const block = useBlock();
 
   const fetchPool = async (addr: `0x${string}`) => {
     const result = await readContract(client, {
       ...curveConfig,
-      functionName: 'tokenPool',
-      args: [addr]
+      functionName: "tokenPool",
+      args: [addr],
     });
     const pool: TokenPool = {
       token: result[0],
       lastPrice: result[5],
-      migrated: result[10]
-    }
+      migrated: result[10],
+    };
     setTokenPool(pool);
-  }
+  };
 
   const fetchFeeParams = async () => {
     const fee = await readContract(client, {
       ...curveConfig,
-      functionName: 'tradingFeeRate'
+      functionName: "tradingFeeRate",
     });
     const denom = await readContract(client, {
       ...curveConfig,
-      functionName: 'FEE_DENOMINATOR'
+      functionName: "FEE_DENOMINATOR",
     });
-    setTradeFeeParams({rate: fee.toString(), denom: denom.toString()});
-  }
+    setTradeFeeParams({ rate: fee.toString(), denom: denom.toString() });
+  };
 
   const fetchBalances = async () => {
     if (client.account && token) {
       const ethBalance = await getBalance(client, {
-        address: client.account?.address
+        address: client.account?.address,
       });
       const tokenBalance = await readContract(client, {
         ...tokenConfig,
         address: token.address as `0x${string}`,
-        functionName: 'balanceOf',
-        args: [client.account.address]
+        functionName: "balanceOf",
+        args: [client.account.address],
       });
 
       setEthBalance(formatEther(ethBalance));
       setTokenBalance(formatEther(tokenBalance));
     }
-  }
+  };
 
   useEffect(() => {
     if (token) {
@@ -166,74 +179,93 @@ const TokenPage = () => {
       fetchBalances();
       fetchFeeParams();
     }
-  }, [token])
+  }, [token]);
 
   const { writeContract } = useWriteContract();
 
-  
   const handleBuy = async () => {
+    setDisableBtn(true);
+
     if (!token) {
-      return
+      return;
     }
     if (ethAmount != "0" && tokenAmount != "0" && block.data) {
-      const amountOutMin = parseEther(tokenAmount) - (parseEther(tokenAmount) * BigInt(slippage) / BigInt("100"));
+      const amountOutMin =
+        parseEther(tokenAmount) -
+        (parseEther(tokenAmount) * BigInt(slippage)) / BigInt("100");
       await writeContract({
         ...curveConfig,
-        functionName: 'swapEthForTokens',
-        args: [token.address as `0x${string}`, parseEther(ethAmount), amountOutMin, block.data.timestamp + BigInt(1*60)],
+        functionName: "swapEthForTokens",
+        args: [
+          token.address as `0x${string}`,
+          parseEther(ethAmount),
+          amountOutMin,
+          block.data.timestamp + BigInt(1 * 60),
+        ],
         // @ts-ignore
-        value: parseEther(ethAmount)
-      })
+        value: parseEther(ethAmount),
+      });
     }
-  }
+
+    setDisableBtn(false);
+  };
 
   const handleSell = async () => {
+    setDisableBtn(true);
     if (!token) {
-      return
+      return;
     }
     if (ethAmount != "0" && tokenAmount != "0" && block.data) {
-      const amountOutMin = parseEther(ethAmount) - (parseEther(ethAmount) * BigInt(slippage) / BigInt("100"));
+      const amountOutMin =
+        parseEther(ethAmount) -
+        (parseEther(ethAmount) * BigInt(slippage)) / BigInt("100");
       // Approve curve to send tokens
       await writeContract({
         ...tokenConfig,
-        functionName: 'approve',
+        functionName: "approve",
         address: token.address as `0x${string}`,
-        args: [curveConfig.address, parseEther(tokenAmount)]
-      })
+        args: [curveConfig.address, parseEther(tokenAmount)],
+      });
       // sell tokens
       await writeContract({
         ...curveConfig,
-        functionName: 'swapTokensForEth',
-        args: [token.address as `0x${string}`, parseEther(tokenAmount), amountOutMin, block.data.timestamp + BigInt(1*60)]
-      })
+        functionName: "swapTokensForEth",
+        args: [
+          token.address as `0x${string}`,
+          parseEther(tokenAmount),
+          amountOutMin,
+          block.data.timestamp + BigInt(1 * 60),
+        ],
+      });
     }
-  }
+    setDisableBtn(false);
+  };
 
   const handleChangeTokenAmountIn = async (amountIn: string) => {
     if (!token || amountIn == "0") {
-      return
-    };
+      return;
+    }
     const amountOut = await readContract(client, {
       ...curveConfig,
-      functionName: 'calcAmountOutFromToken',
-      args: [token.address as `0x${string}`, parseEther(amountIn)]
+      functionName: "calcAmountOutFromToken",
+      args: [token.address as `0x${string}`, parseEther(amountIn)],
     });
     setTokenAmount(amountIn);
     setEthAmount(formatEther(amountOut));
-  }
+  };
 
   const handleChangeEthAmountIn = async (amountIn: string) => {
     if (!token || amountIn == "0") {
-      return
-    };
+      return;
+    }
     const amountOut = await readContract(client, {
       ...curveConfig,
-      functionName: 'calcAmountOutFromEth',
-      args: [token.address as `0x${string}`, parseEther(amountIn)]
+      functionName: "calcAmountOutFromEth",
+      args: [token.address as `0x${string}`, parseEther(amountIn)],
     });
     setEthAmount(amountIn);
     setTokenAmount(formatEther(amountOut));
-  }
+  };
 
   const toggleBuy = () => {
     setBuyActive(true);
@@ -248,169 +280,244 @@ const TokenPage = () => {
   const toggleSlippage = () => {
     setShowSlippageModal(!showSlippageModal);
   };
+
+  //function to copy token creator to clipboard
+  const [copied, setCopied] = useState(false);
+  const handleCopyTokenCreator = async () => {
+    setCopied(false);
+    if (token?.creator) {
+      try {
+        await navigator.clipboard.writeText(token.creator);
+        setCopied(true);
+        setTimeout(() => {
+          setCopied(false);
+        }, 3000);
+      } catch (err) {
+        console.error("Failed to copy content: ", err);
+        setCopied(false);
+      }
+    } else {
+      alert("No token creator found");
+    }
+  };
+
+  //Array to contain swap success messages
+  const swapSuccessMessages = {
+    mainMessage: "Swap Successful!",
+    subMessage: `Successfuly swapped 2ETH for 2000 DEez`,
+  };
+
   return (
     <div className="token-page">
-      {
-        token && tokenPool ?
+      {token && tokenPool ? (
         <div className="token-page-wrapper">
-        <section className="section1">
-          <div className="section1-left">
-            <img
-              className="tokenImg"
-              src="./assets/images/tokenImg1.png"
-              alt=""
-            />
-            <div className="text-wrapper">
-              <h2>{token.name} (ticker: {token.symbol})</h2>
-              <p>
-                {token.description}. Pepebox has a market size of {formatEther(BigInt(token.marketCap))} ETH
-              </p>
-              <div className="creator-details">
-                <div className="creator-name">
-                  <img src="./assets/images/user.png" alt="" />
-                  <p>
-                    Created by <span className="schwarzy">{truncate(token.creator)}</span>
-                  </p>
-                </div>
-                <div className="creator-address">
-                  <img src="./assets/images/copy.png" alt="" />
-                  <p>{truncate(token.creator)}</p>
+          <section className="section1">
+            <div className="section1-left">
+              <img
+                className="tokenImg"
+                src="./assets/images/tokenImg1.png"
+                alt=""
+              />
+              <div className="text-wrapper">
+                <h2>
+                  {token.name} (ticker: {token.symbol})
+                </h2>
+                <p>
+                  {token.description}. Pepebox has a market size of{" "}
+                  {formatEther(BigInt(token.marketCap))} ETH
+                </p>
+                <div className="creator-details">
+                  <div className="creator-name">
+                    <img src="./assets/images/user.png" alt="" />
+                    <p>
+                      Created by{" "}
+                      <a href="#" target="blank" className="schwarzy">
+                        {truncate(token.creator)}
+                      </a>
+                    </p>
+                  </div>
+                  <div
+                    onClick={handleCopyTokenCreator}
+                    className="creator-address"
+                  >
+                    <img src="./assets/images/copy.png" alt="" />
+                    <p>{truncate(token.creator)}</p>
+                    {copied && <p className="address-copied">Address copied</p>}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="section1-right">
-            <div className="position">
-              <div className=" buy-sell-wrapper">
-                <button
-                  onClick={toggleBuy}
-                  className={buyActive ? "buy activePosition" : "buy"}
-                >
-                  Buy
-                </button>
-                <button
-                  onClick={toggleSell}
-                  className={sellActive ? "sell activePosition" : "sell"}
-                >
-                  Sell
+            <div className="section1-right">
+              <div className="position">
+                <div className=" buy-sell-wrapper">
+                  <button
+                    onClick={toggleBuy}
+                    className={buyActive ? "buy activePosition" : "buy"}
+                  >
+                    Buy
+                  </button>
+                  <button
+                    onClick={toggleSell}
+                    className={sellActive ? "sell activePosition" : "sell"}
+                  >
+                    Sell
+                  </button>
+                </div>
+                <button onClick={toggleSlippage} className="slippage">
+                  <img src="./assets/images/settings.png" alt="" />{" "}
+                  <p>Set max slippage</p>
                 </button>
               </div>
-              <button onClick={toggleSlippage} className="slippage">
-                <img src="./assets/images/settings.png" alt="" />{" "}
-                <p>Set max slippage</p>
-              </button>
-            </div>
-            <div className="swap-box">
-              {
-                buyActive ?
-                <div>
-                <div className="from-token">
+              <div className="swap-box">
+                {buyActive ? (
                   <div>
-                    <button className="from-token-btn">
-                      <img src="./assets/images/eth.png" height="20" alt="" />
-                      <p>ETH</p>
-                      {/* <img src="./assets/images/arrowDown.png" alt="" /> */}
-                    </button>
+                    <div className="from-token">
+                      <div>
+                        <button className="from-token-btn">
+                          <img
+                            src="./assets/images/eth.png"
+                            height="20"
+                            alt=""
+                          />
+                          <p>ETH</p>
+                          {/* <img src="./assets/images/arrowDown.png" alt="" /> */}
+                        </button>
+                      </div>
+                      <div className="amount-container">
+                        <div className="amount-wrapper">
+                          <input
+                            type="number"
+                            placeholder="0.0"
+                            name="quantity"
+                            id="qunatity"
+                            onChange={(e) =>
+                              handleChangeEthAmountIn(e.target.value)
+                            }
+                          />{" "}
+                          <p className="wallet-bal-wrapper">
+                            <img src="./assets/images/wallet.png " alt="" />
+                            <span>{ethBalance}</span>
+                          </p>
+                        </div>
+                        {estRecieveAmt && (
+                          <p className="recieve-amount">
+                            You recieve <span>{estRecieveAmt} DEEZ</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="amount-wrapper">
-                    <input
-                      type="number"
-                      placeholder="0.0"
-                      name="quantity"
-                      id="qunatity"
-                      onChange={(e) => handleChangeEthAmountIn(e.target.value)}
-                    />{" "}
-                    <p className="wallet-bal-wrapper">
-                      <img src="./assets/images/wallet.png " alt="" />
-                      <span>{ethBalance}</span>
-                    </p>{" "}
+                ) : (
+                  <div className="to-token">
+                    <div>
+                      <button className="from-token-btn">
+                        <img src="./assets/images/3 2.png" alt="" />
+                        <p>{token.symbol}</p>
+                      </button>
+                    </div>
+                    <div className="amount-container">
+                      <div className="amount-wrapper">
+                        <input
+                          type="number"
+                          placeholder="0.0"
+                          name="quantity"
+                          id="qunatity"
+                          onChange={(e) =>
+                            handleChangeTokenAmountIn(e.target.value)
+                          }
+                        />{" "}
+                        <p className="wallet-bal-wrapper">
+                          <img src="./assets/images/wallet.png " alt="" />
+                          <span>{tokenBalance}</span>
+                        </p>{" "}
+                      </div>
+                      {estRecieveAmt && (
+                        <p className="recieve-amount">
+                          You recieve <span>{estRecieveAmt} ETH </span>
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-                </div> :
-                <div className="to-token">
-                  <div>
-                    <button className="from-token-btn">
-                      <img src="./assets/images/3 2.png" alt="" />
-                      <p>{token.symbol}</p>
-                    </button>
-                  </div>
-                  <div className="amount-wrapper">
-                    <input
-                      type="number"
-                      placeholder="0.0"
-                      name="quantity"
-                      id="qunatity"
-                      onChange={(e) => handleChangeTokenAmountIn(e.target.value)}
-                    />{" "}
-                    <p className="wallet-bal-wrapper">
-                      <img src="./assets/images/wallet.png " alt="" />
-                      <span>{tokenBalance}</span>
-                    </p>{" "}
-                  </div>
-                </div>
-              }
-              
-              {/* <button className="switch-token">
+                )}
+
+                {/* <button className="switch-token">
                 <img src="./assets/images/swap.png" alt="" />
               </button> */}
-            </div>
-            <button className="trade-btn" onClick={buyActive ? handleBuy : handleSell }>Place trade</button>
-          </div>
-        </section>
-        <section className="section2"></section>
-        <section className="section3">
-          <div className="section3-header">
-            <h2>Trades</h2>{" "}
-            <div>
-              <img className="prev-btn" src="./assets/images/next.png" alt="" />{" "}
-              <p>1</p>{" "}
-              <img className="next-btn" src="./assets/images/next.png" alt="" />{" "}
-            </div>
-          </div>
-          <div className="trades-table-wrapper">
-            <table>
-              <tr className="table-header">
-                <th className="border-radius1">Type</th>
-                <th>Account</th>
-                <th>Sol</th>
-                <th>Pepebox</th>
-                <th>Date</th>
-                <th className="border-radius2">Transactions</th>
-              </tr>
-              {trades.map((trade, index) => (
-                <TradeRow key={index} trade={trade} />
-              ))}
-              {/* <TradeRow /> */}
-            </table>
-          </div>
-        </section>
-
-        {showSlippageModal && (
-          <section className="slippage-wrapper">
-            <div className="slippage-modal">
-              <div className="slippage-header">
-                <div className="settings">
-                  <h2>Settings</h2>{" "}
-                  <button onClick={toggleSlippage} className="close-btn">
-                    <img src="./assets/images/close.svg" alt="" />
-                  </button>{" "}
-                </div>
-                <p>Set max spillage</p>
               </div>
-              <div className="inputs">
-                <div className="max-spillage-wrapper">
-                  <p>Max Spillage</p>
-                  <div className="max-spillage">
-                    <input
-                      type="number"
-                      name="spillage"
-                      id="spillage"
-                      placeholder="2%"
-                      onChange={(e) => setSlippage(e.target.value)}
-                    />
+              <div className="btn-wrapper">
+                <button
+                  className={disableBtn ? "disabled-btn" : "trade-btn"}
+                  onClick={buyActive ? handleBuy : handleSell}
+                >
+                  Place trade
+                </button>
+                <SuccessToast swapSuccessMessages={swapSuccessMessages} />
+                <FailedToasts />
+              </div>
+            </div>
+          </section>
+          <section className="section2"></section>
+          <section className="section3">
+            <div className="section3-header">
+              <h2>Trades</h2>{" "}
+              <div>
+                <img
+                  className="prev-btn"
+                  src="./assets/images/next.png"
+                  alt=""
+                />{" "}
+                <p>1</p>{" "}
+                <img
+                  className="next-btn"
+                  src="./assets/images/next.png"
+                  alt=""
+                />{" "}
+              </div>
+            </div>
+            <div className="trades-table-wrapper">
+              <table>
+                <tr className="table-header">
+                  <th className="border-radius1">Type</th>
+                  <th>Account</th>
+                  <th>Sol</th>
+                  <th>Pepebox</th>
+                  <th>Date</th>
+                  <th className="border-radius2">Transactions</th>
+                </tr>
+                {trades.map((trade, index) => (
+                  <TradeRow key={index} trade={trade} />
+                ))}
+                {/* <TradeRow /> */}
+              </table>
+            </div>
+          </section>
+
+          {showSlippageModal && (
+            <section className="slippage-wrapper">
+              <div className="slippage-modal">
+                <div className="slippage-header">
+                  <div className="settings">
+                    <h2>Settings</h2>{" "}
+                    <button onClick={toggleSlippage} className="close-btn">
+                      <img src="./assets/images/close.svg" alt="" />
+                    </button>{" "}
                   </div>
+                  <p>Set max spillage</p>
                 </div>
-                {/* <div className="priority-fee-wrapper">
+                <div className="inputs">
+                  <div className="max-spillage-wrapper">
+                    <p>Max Spillage</p>
+                    <div className="max-spillage">
+                      <input
+                        type="number"
+                        name="spillage"
+                        id="spillage"
+                        placeholder="2%"
+                        onChange={(e) => setSlippage(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  {/* <div className="priority-fee-wrapper">
                   <p>Priority fee</p>
                   <div className="priority-fee-input">
                     <div>
@@ -429,17 +536,18 @@ const TokenPage = () => {
                     confirmations, paid to the Solana network for each trade.
                   </p>
                 </div> */}
-                <button onClick={toggleSlippage} className="save-settings">
-                  {" "}
-                  Save Settings
-                </button>
+                  <button onClick={toggleSlippage} className="save-settings">
+                    {" "}
+                    Save Settings
+                  </button>
+                </div>
               </div>
-            </div>
-          </section>
-        )}
-        </div> :
-        <EmptyState data={{message: loading ? "Loading" : "Not found"}} />
-      }
+            </section>
+          )}
+        </div>
+      ) : (
+        <EmptyState data={{ message: loading ? "Loading" : "Not found" }} />
+      )}
     </div>
   );
 };

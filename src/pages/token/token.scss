@@ -75,6 +75,21 @@ $desktop: 1024px;
   background-color: #1c1c1c;
   border-radius: 10px;
   padding: 10px 16px;
+  cursor: pointer;
+  position: relative;
+
+  .address-copied {
+    position: absolute;
+    bottom: -100%;
+    left: 0px;
+    padding: 7px;
+    background-color: #e4cce1;
+    color: #111111;
+    border-radius: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+  }
 }
 .section1-right {
 }
@@ -134,17 +149,42 @@ $desktop: 1024px;
   background-color: #202020;
   border-radius: 15px;
 }
-
+.amount-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+  .recieve-amount {
+    width: 100%;
+    text-align: end;
+    span {
+      color: #e4cce1;
+    }
+  }
+}
 .amount-wrapper {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 .amount-wrapper input {
   font-size: 28px;
   width: 100%;
 }
+
+// .right-amount-wrapper {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 8px;
+//   align-items: end;
+//   width: 100%;
+//   .recieve-amount {
+//     width: 100%;
+//     span {
+//     }
+//   }
+// }
 .switch-token {
   position: absolute;
   background-color: #e4cce1;
@@ -165,6 +205,11 @@ $desktop: 1024px;
   font-size: 18px;
 }
 
+.btn-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .trade-btn {
   width: 100%;
   background-color: #e4cce1;
@@ -173,6 +218,16 @@ $desktop: 1024px;
   color: #111111;
   border-radius: 10px;
   font-weight: 600;
+}
+.disabled-btn {
+  width: 100%;
+  background-color: #e4cce152;
+  padding: 15px 12px;
+  text-align: center;
+  color: #111111;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: not-allowed;
 }
 
 .section2 {

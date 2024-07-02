@@ -51,12 +51,6 @@ const Topbar = () => {
           </div>
         </div>
 
-        {/* <p className="time-display">
-        {dayjs()
-          .tz("America/New_York")
-          .format("dddd, MMM D, [New York,] HH:mm")}
-      </p> */}
-        {/* <SearchbarWithShortcut /> */}
 
         <div className="c-topbar__block">
           {address ? (

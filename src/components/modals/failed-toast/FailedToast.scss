@@ -1,0 +1,33 @@
+.success-toast-wrapper {
+  padding: 10px 15px;
+  background-color: #111111;
+  display: flex;
+  gap: 15px;
+  width: 100%;
+  position: absolute;
+  bottom: -250%;
+  left: 0px;
+  border: 1px solid #ec1e1e;
+  border-radius: 20px;
+
+  .success-message {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+    h2 {
+      color: #ec1e1e;
+      font-size: 16px;
+    }
+    p {
+      color: #ababab;
+      font-size: 14px;
+    }
+  }
+}
+
+.success-img-wrapper {
+  img {
+    aspect-ratio: 1/1;
+  }
+}
