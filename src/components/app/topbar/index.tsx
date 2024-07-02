@@ -35,7 +35,7 @@ const Topbar = () => {
                       src={`./assets/images/${((index + 1) % 4) + 1}.jpg`}
                       alt=""
                     />
-                    <p>0xfe3...4fc bought 10 PUMP</p>
+                    <p>0xfe3...4fc bought 10 RAMP</p>
                   </div>
                 );
               })}
