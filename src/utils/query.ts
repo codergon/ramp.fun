@@ -40,3 +40,23 @@ export const GET_TOKEN = gql`
   }
 }
 `
+
+export const GET_TRADES = gql`query MyQuery($tokenId: String) {
+  trades(
+    orderBy: "timestamp"
+    orderDirection: "desc"
+    where: {tokenId: $tokenId}
+    limit: 10
+  ) {
+    items {
+      action
+      actor
+      tokenId
+      id
+      timestamp
+      fee
+      amountOut
+      amountIn
+    }
+  }
+}`

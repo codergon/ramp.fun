@@ -520,7 +520,7 @@ const TokenPage = () => {
             </div>
           </section>
           {/* <section className="section2"></section> */}
-          {/* <section className="section3">
+          <section className="section3">
             <div className="section3-header">
               <h2>Trades</h2>{" "}
               <div>
@@ -542,8 +542,8 @@ const TokenPage = () => {
                 <tr className="table-header">
                   <th className="border-radius1">Type</th>
                   <th>Account</th>
-                  <th>Sol</th>
-                  <th>Pepebox</th>
+                  <th>ETH</th>
+                  <th>{token.symbol}</th>
                   <th>Date</th>
                   <th className="border-radius2">Transactions</th>
                 </tr>
@@ -552,7 +552,7 @@ const TokenPage = () => {
                 ))}
               </table>
             </div>
-          </section> */}
+          </section>
 
           {showSlippageModal && (
             <section className="slippage-wrapper">
