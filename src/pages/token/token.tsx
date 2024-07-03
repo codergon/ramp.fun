@@ -9,7 +9,11 @@ import { numberWithCommas, truncate } from "utils/HelperUtils";
 import { Address, formatEther, parseEther } from "viem";
 import { useWriteContract, useClient, useBlock, useAccount } from "wagmi";
 import { curveConfig, tokenConfig } from "../../constants/data";
-import { getBalance, readContract, waitForTransactionReceipt } from "viem/actions";
+import {
+  getBalance,
+  readContract,
+  waitForTransactionReceipt,
+} from "viem/actions";
 import SuccessToast from "../../components/modals/success-toast/successToast";
 import FailedToasts from "../../components/modals/failed-toast/FailedToast";
 import { useTrades } from "hooks/useTrades";
@@ -36,8 +40,16 @@ const TokenPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
-  const { token, loading: tokenLoading, refetch: refetchToken } = useToken(tokenId ? tokenId : "");
-  const { trades, refresh: refreshTrades } = useTrades(tokenId ? tokenId : "", "timestamp", 10);
+  const {
+    token,
+    loading: tokenLoading,
+    refetch: refetchToken,
+  } = useToken(tokenId ? tokenId : "");
+  const { trades, refresh: refreshTrades } = useTrades(
+    tokenId ? tokenId : "",
+    "timestamp",
+    10
+  );
   const [disableBtn, setDisableBtn] = useState(true);
   const [btnLoading, setBtnLoading] = useState(false);
 
@@ -93,7 +105,7 @@ const TokenPage = () => {
       setEthBalance("0");
       setTokenBalance("0");
     }
-  }, [isConnected, token])
+  }, [isConnected, token]);
 
   const handleError = (error: any) => {
     console.log(error);
@@ -103,14 +115,14 @@ const TokenPage = () => {
     setTimeout(() => {
       setShowFailModal(false);
     }, 3000);
-  }
+  };
 
   const handleSuccess = async (hash: Address) => {
     try {
       // @ts-ignore
       await waitForTransactionReceipt(client, {
-        hash
-      })
+        hash,
+      });
       await refetchToken();
       setTxnHash(hash);
       setShowSuccessModal(true);
@@ -122,38 +134,39 @@ const TokenPage = () => {
     }
     setDisableBtn(false);
     setBtnLoading(false);
-  }
+  };
 
   const handleApprovalSuccess = async (hash: Address) => {
     // @ts-ignore
     await waitForTransactionReceipt(client, {
-      hash
-    })
+      hash,
+    });
     const amountOutMin =
       parseEther(ethAmountOut) -
       (parseEther(ethAmountOut) * BigInt(slippage)) / BigInt("100");
     const { data } = await refetchBlock();
     // sell tokens
-    await writeContractAsync({
-      ...curveConfig,
-      functionName: "swapTokensForEth",
-      args: [
-        token!.address,
-        parseEther(tokenAmountIn),
-        amountOutMin,
-        data!.timestamp + BigInt(1 * 60),
-      ],
-    },
+    await writeContractAsync(
+      {
+        ...curveConfig,
+        functionName: "swapTokensForEth",
+        args: [
+          token!.address,
+          parseEther(tokenAmountIn),
+          amountOutMin,
+          data!.timestamp + BigInt(1 * 60),
+        ],
+      },
       {
         onSuccess: async (hash) => {
           await handleSuccess(hash);
         },
         onError: (e) => {
           handleError(e.message);
-        }
+        },
       }
     );
-  }
+  };
 
   const handleBuy = async () => {
     setDisableBtn(true);
@@ -166,30 +179,33 @@ const TokenPage = () => {
       if (!data) {
         handleError(error);
         setDisableBtn(true);
-        return
+        return;
       }
       const amountOutMin =
         parseEther(tokenAmountOut) -
         (parseEther(tokenAmountOut) * BigInt(slippage)) / BigInt("100");
-      await writeContractAsync({
-        ...curveConfig,
-        functionName: "swapEthForTokens",
-        args: [
-          token.address,
-          parseEther(ethAmountIn),
-          amountOutMin,
-          data.timestamp + BigInt(1 * 60),
-        ],
-        // @ts-ignore
-        value: parseEther(ethAmountIn),
-      }, {
-        onSuccess: async (data) => {
-          await handleSuccess(data)
+      await writeContractAsync(
+        {
+          ...curveConfig,
+          functionName: "swapEthForTokens",
+          args: [
+            token.address,
+            parseEther(ethAmountIn),
+            amountOutMin,
+            data.timestamp + BigInt(1 * 60),
+          ],
+          // @ts-ignore
+          value: parseEther(ethAmountIn),
         },
-        onError: (error) => {
-          handleError(error.message);
-        },
-      });
+        {
+          onSuccess: async (data) => {
+            await handleSuccess(data);
+          },
+          onError: (error) => {
+            handleError(error.message);
+          },
+        }
+      );
     }
   };
 
@@ -204,24 +220,25 @@ const TokenPage = () => {
       if (!data) {
         handleError(error);
         setDisableBtn(true);
-        return
+        return;
       }
       // Approve curve to send tokens
-      await writeContractAsync({
-        ...tokenConfig,
-        functionName: "approve",
-        address: token.address,
-        args: [curveConfig.address, parseEther(tokenAmountIn)],
-      },
-      {
-        onSuccess: async (hash) => {
-          await handleApprovalSuccess(hash)
+      await writeContractAsync(
+        {
+          ...tokenConfig,
+          functionName: "approve",
+          address: token.address,
+          args: [curveConfig.address, parseEther(tokenAmountIn)],
         },
-        onError: (error) => {
-          handleError(error.message);
+        {
+          onSuccess: async (hash) => {
+            await handleApprovalSuccess(hash);
+          },
+          onError: (error) => {
+            handleError(error.message);
+          },
         }
-      }
-    );
+      );
     }
   };
 
@@ -319,7 +336,7 @@ const TokenPage = () => {
                   {token.name} (ticker: {token.symbol})
                 </h2>
                 <p>
-                  {token.description}. {token.name} has a market size of {" "}
+                  {token.description}. {token.name} has a market size of{" "}
                   {formatEther(BigInt(token.marketCap))} ETH
                 </p>
                 <div className="creator-details">
@@ -327,7 +344,11 @@ const TokenPage = () => {
                     <img src="./assets/images/user.png" alt="" />
                     <p>
                       Created by{" "}
-                      <a href={`${client.chain.blockExplorers.default.url}/address/${token.creator}`} target="_blank" className="schwarzy">
+                      <a
+                        href={`${client.chain.blockExplorers.default.url}/address/${token.creator}`}
+                        target="_blank"
+                        className="schwarzy"
+                      >
                         {truncate(token.creator)}
                       </a>
                     </p>
@@ -397,7 +418,13 @@ const TokenPage = () => {
                           </p>
                         </div>
                         <p className="recieve-amount">
-                          You recieve <span>{numberWithCommas(parseFloat(tokenAmountOut).toFixed(2))} {token.symbol}</span>
+                          You recieve{" "}
+                          <span>
+                            {numberWithCommas(
+                              parseFloat(tokenAmountOut).toFixed(2)
+                            )}{" "}
+                            {token.symbol}
+                          </span>
                         </p>
                       </div>
                     </div>
@@ -423,7 +450,11 @@ const TokenPage = () => {
                         />{" "}
                         <p className="wallet-bal-wrapper">
                           <img src="./assets/images/wallet.png " alt="" />
-                          <span>{numberWithCommas(parseFloat(tokenBalance).toFixed(2))}</span>
+                          <span>
+                            {numberWithCommas(
+                              parseFloat(tokenBalance).toFixed(2)
+                            )}
+                          </span>
                         </p>{" "}
                       </div>
                       <p className="recieve-amount">
@@ -433,34 +464,49 @@ const TokenPage = () => {
                   </div>
                 )}
 
-                <button className="switch-token">
+                {/* <button className="switch-token">
                   <img src="./assets/images/swap.png" alt="" />
-                </button>
+                </button> */}
               </div>
               <div className="btn-wrapper">
                 <button
                   className={
-                    disableBtn || (buyActive && (ethAmountIn == "0" || !ethAmountIn)) || 
-                    (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn)) 
-                    ? "disabled-btn" : "trade-btn"
+                    disableBtn ||
+                    (buyActive && (ethAmountIn == "0" || !ethAmountIn)) ||
+                    (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn))
+                      ? "disabled-btn"
+                      : "trade-btn"
                   }
-                  disabled={disableBtn || (buyActive && (ethAmountIn == "0" || !ethAmountIn)) || 
-                    (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn)) ? true : false}
+                  disabled={
+                    disableBtn ||
+                    (buyActive && (ethAmountIn == "0" || !ethAmountIn)) ||
+                    (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn))
+                      ? true
+                      : false
+                  }
                   onClick={buyActive ? handleBuy : handleSell}
                 >
-                  {
-                    btnLoading ? 
+                  {btnLoading ? (
                     <ClipLoader
-                        size={20}
-                        color={"#fff"}
-                        loading={btnLoading}
-                        aria-label="Loading Spinner"
-                    /> :
+                      size={20}
+                      color={"#fff"}
+                      loading={btnLoading}
+                      aria-label="Loading Spinner"
+                    />
+                  ) : (
                     <p>Place trade</p>
-                  }
+                  )}
                 </button>
-                { showSuccessModal && <SuccessToast {...{message: "Trade sucessfully placed", hash: txnHash, url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`}} /> }
-                { showFailModal && <FailedToasts /> }
+                {showSuccessModal && (
+                  <SuccessToast
+                    {...{
+                      message: "Trade sucessfully placed",
+                      hash: txnHash,
+                      url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`,
+                    }}
+                  />
+                )}
+                {showFailModal && <FailedToasts />}
               </div>
             </div>
           </section>
@@ -493,7 +539,11 @@ const TokenPage = () => {
                   <th className="border-radius2">Date</th>
                 </tr>
                 {trades.map((trade, index) => (
-                  <TradeRow key={index} trade={trade} explorerUrl={client.chain.blockExplorers.default.url} />
+                  <TradeRow
+                    key={index}
+                    trade={trade}
+                    explorerUrl={client.chain.blockExplorers.default.url}
+                  />
                 ))}
               </table>
             </div>
@@ -553,7 +603,9 @@ const TokenPage = () => {
           )}
         </div>
       ) : (
-        <EmptyState data={{ message: tokenLoading ? "Loading" : "Not found" }} />
+        <EmptyState
+          data={{ message: tokenLoading ? "Loading" : "Not found" }}
+        />
       )}
     </div>
   );
