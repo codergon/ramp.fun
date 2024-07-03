@@ -7,6 +7,8 @@ import { Accordion, AccordionItem } from "@szhsin/react-accordion";
 import { CameraPlus, CaretDoubleRight, CaretUp } from "@phosphor-icons/react";
 import { useWriteContract, useReadContract } from "wagmi";
 import { curveConfig } from "../../constants/data";
+import SuccessToast from "components/modals/success-toast/successToast";
+import FailedToasts from "components/modals/failed-toast/FailedToast";
 
 const CreateToken = () => {
   const [name, setName] = useState("");
@@ -21,7 +23,7 @@ const CreateToken = () => {
   const { writeContract } = useWriteContract();
   const creationFee = useReadContract({
     ...curveConfig,
-    functionName: 'creationFee'
+    functionName: "creationFee",
   });
 
   const [TokenMenu, selectedToken] = useAppObjMenu({
@@ -30,6 +32,9 @@ const CreateToken = () => {
     toggleCallback: (val) => {},
     items: [],
   });
+
+  const [showFailModal, setShowFailModal] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // HANDLE IMAGE UPLOAD
   const imageRef = useRef<HTMLInputElement | null>(null);
@@ -42,25 +47,28 @@ const CreateToken = () => {
   };
 
   const handleCreateToken = async () => {
-    if (name == "" || description == "" || ticker == "" || selectedFile == null) return
+    if (name == "" || description == "" || ticker == "" || selectedFile == null)
+      return;
     setLoading(true);
     writeContract({
       ...curveConfig,
-      functionName: 'launchToken',
+      functionName: "launchToken",
       // @ts-ignore
       value: creationFee.data ? creationFee.data : BigInt(0),
-      args: [{
-        name,
-        description,
-        twitterLink: twitter,
-        telegramLink: telegram,
-        symbol: ticker,
-        website,
-        image: selectedFile.toString()
-      }],
-    })
+      args: [
+        {
+          name,
+          description,
+          twitterLink: twitter,
+          telegramLink: telegram,
+          symbol: ticker,
+          website,
+          image: selectedFile.toString(),
+        },
+      ],
+    });
     setLoading(false);
-  }
+  };
 
   useEffect(() => {
     // create the preview
@@ -118,6 +126,16 @@ const CreateToken = () => {
               </p>
             </div>
           </div>
+          {showSuccessModal && (
+            <SuccessToast
+              {...{
+                message: "Trade sucessfully placed",
+                hash: txnHash,
+                url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`,
+              }}
+            />
+          )}
+          {showFailModal && <FailedToasts />}
 
           {/* INPUTS */}
           <div className="createToken__form--body">

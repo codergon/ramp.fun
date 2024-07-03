@@ -36,7 +36,7 @@ const TokenPage = () => {
   const [ethBalance, setEthBalance] = useState("0");
   const [tokenBalance, setTokenBalance] = useState("0");
   const [slippage, setSlippage] = useState("2");
-  const [showFailModal, setShowFailModal] = useState(false);
+  const [showFailModal, setShowFailModal] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
@@ -91,6 +91,8 @@ const TokenPage = () => {
     }
   };
 
+  const [bondingPercentage, setBondingPercentage] = useState(20);
+
   useEffect(() => {
     if (token) {
       fetchPool(token.address);
@@ -128,7 +130,7 @@ const TokenPage = () => {
       setShowSuccessModal(true);
       setTimeout(() => {
         setShowSuccessModal(false);
-      }, 5000);
+      }, 3000);
     } catch (e) {
       handleError(e);
     }
@@ -497,16 +499,33 @@ const TokenPage = () => {
                     <p>Place trade</p>
                   )}
                 </button>
+
                 {showSuccessModal && (
-                  <SuccessToast
-                    {...{
-                      message: "Trade sucessfully placed",
-                      hash: txnHash,
-                      url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`,
-                    }}
-                  />
+                  <div className="marginTop">
+                    <SuccessToast
+                      {...{
+                        message: "Trade sucessfully placed",
+                        hash: txnHash,
+                        url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`,
+                      }}
+                    />
+                  </div>
                 )}
-                {showFailModal && <FailedToasts />}
+                {showFailModal && (
+                  <div className="marginTop">
+                    <FailedToasts />
+                  </div>
+                )}
+                <div className="bonding-curve-wrapper">
+                  <p>Bonding Curve: {bondingPercentage}%</p>
+                  <div className="bonding-curve-loader">
+                    <div
+                      style={{
+                        width: `${bondingPercentage}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>

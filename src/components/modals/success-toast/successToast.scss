@@ -2,12 +2,13 @@
   padding: 10px 15px;
   background-color: #111111;
   display: flex;
+  // margin-top: 20px;
   gap: 15px;
   width: 100%;
-  position: absolute;
-  bottom: -250%;
-  left: 0px;
-  border: 1px solid #5edc11;
+  // position: absolute;
+  // bottom: -250%;
+  // left: 0px;
+  border: 1px solid #44a209;
   border-radius: 20px;
 
   .success-message {
@@ -16,7 +17,7 @@
     gap: 5px;
     width: 100%;
     h2 {
-      color: #5edc11;
+      color: #4aba04;
       font-size: 16px;
     }
     p {
@@ -31,3 +32,4 @@
     aspect-ratio: 1/1;
   }
 }
+// 5edc11

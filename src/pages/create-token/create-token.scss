@@ -38,7 +38,7 @@
     max-width: 100%;
 
     &--inner {
-      @include flex(column, center, center, 16px);
+      @include flex(column, center, center, 10px);
       width: 400px;
       max-width: 95%;
     }

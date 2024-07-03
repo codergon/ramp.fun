@@ -182,25 +182,29 @@ $desktop: 1024px;
   width: 100%;
   flex-direction: column;
   gap: 7px;
-  max-width: 100px;
+  margin-top: 20px;
   align-items: center;
   p {
     width: 100%;
-    font-size: 14px;
-    text-align: center;
+    // font-size: 14px;
+    // text-align: center;
   }
   .bonding-curve-loader {
     width: 100%;
-    height: 4px;
+    height: 14px;
     border-radius: 999px;
-    background-color: #111111;
+    background-color: #1c1c1c;
     div {
       background-color: green;
       border-radius: 999px;
-      width: 50%;
+
       height: 100%;
     }
   }
+}
+
+.marginTop {
+  margin-top: 20px;
 }
 
 // .right-amount-wrapper {
