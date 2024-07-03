@@ -12,13 +12,13 @@ interface MyObject {
 // }
 const FailedToasts = () => {
   return (
-    <div className="success-toast-wrapper">
-      <div className="success-img-wrapper">
+    <div className="failed-toast-wrapper">
+      <div className="failed-img-wrapper">
         <img src="./assets/images/failed.png" alt="" />
       </div>
-      <div className="success-message">
-        <h2>Interraction Failed!</h2>
-        <p>We couldn't process your request</p>
+      <div className="failed-message">
+        <h2>Operation Failed!</h2>
+        <p>We couldn't process your transaction</p>
       </div>
     </div>
   );

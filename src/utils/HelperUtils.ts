@@ -45,3 +45,7 @@ export function extractEthAddress(inputString: string) {
   const match = inputString.match(ethAddressRegex);
   return match ? match[0] : "";
 }
+
+export function numberWithCommas(input: string) {
+  return input.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

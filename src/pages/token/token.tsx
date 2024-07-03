@@ -1,16 +1,15 @@
 import TradeRow from "components/common/trades-row/tradeRow";
+import { ClipLoader } from "react-spinners";
 import "./token.scss";
 import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import Close from "../../../public/assets/images/Vector.svg";
+import { useEffect, useState } from "react";
 import { useToken } from "../../hooks/useToken";
 import EmptyState from "components/common/empty-state";
-import { truncate } from "utils/HelperUtils";
-import { formatEther, parseEther } from "viem";
-import { useWriteContract, useClient, useBlock } from "wagmi";
+import { numberWithCommas, truncate } from "utils/HelperUtils";
+import { Address, formatEther, parseEther } from "viem";
+import { useWriteContract, useClient, useBlock, useAccount } from "wagmi";
 import { curveConfig, tokenConfig } from "../../constants/data";
-import { getBalance, multicall, readContract } from "viem/actions";
-import { add, set } from "lodash";
+import { getBalance, readContract, waitForTransactionReceipt } from "viem/actions";
 import SuccessToast from "../../components/modals/success-toast/successToast";
 import FailedToasts from "../../components/modals/failed-toast/FailedToast";
 
@@ -91,16 +90,8 @@ const trades = [
 ];
 
 interface TokenPool {
-  token: `0x${string}`;
-  // tokenReserve: bigint;
-  // virtualTokenReserve: bigint;
-  // ethReserve: bigint;
-  // virtualEthReserve: bigint;
+  token: Address;
   lastPrice: bigint;
-  // lastMcapInEth: bigint;
-  // lastTimestamp: bigint;
-  // lastBlock: bigint;
-  // creator: `0x${string}`;
   migrated: boolean;
 }
 
@@ -109,28 +100,28 @@ const TokenPage = () => {
   const [buyActive, setBuyActive] = useState(true);
   const [sellActive, setSellActive] = useState(false);
   const [tokenPool, setTokenPool] = useState<TokenPool>();
-  const [tradeFeeParams, setTradeFeeParams] = useState<{
-    rate: string;
-    denom: string;
-  }>();
-  const [ethAmount, setEthAmount] = useState("0");
-  const [tokenAmount, setTokenAmount] = useState("0");
+  const [ethAmountIn, setEthAmountIn] = useState("0");
+  const [ethAmountOut, setEthAmountOut] = useState("0");
+  const [tokenAmountIn, setTokenAmountIn] = useState("0");
+  const [tokenAmountOut, setTokenAmountOut] = useState("0");
   const [ethBalance, setEthBalance] = useState("0");
   const [tokenBalance, setTokenBalance] = useState("0");
   const [slippage, setSlippage] = useState("2");
   const [showFailModal, setShowFailModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
-  const { token, loading, error } = useToken(tokenId ? tokenId : "");
-  const [disableBtn, setDisableBtn] = useState(false);
-
-  //conditionally render the estReceiveAmt
-  const [estRecieveAmt, setEstReceiveAmt] = useState("20");
+  const { token, loading, refetch: refetchToken } = useToken(tokenId ? tokenId : "");
+  const [disableBtn, setDisableBtn] = useState(true);
+  const [btnLoading, setBtnLoading] = useState(false);
 
   const client = useClient();
-  const block = useBlock();
+  const { address, isConnected } = useAccount();
+  const { refetch: refetchBlock } = useBlock();
+  const { writeContractAsync } = useWriteContract();
 
-  const fetchPool = async (addr: `0x${string}`) => {
+  const fetchPool = async (addr: Address) => {
+    // @ts-ignore
     const result = await readContract(client, {
       ...curveConfig,
       functionName: "tokenPool",
@@ -144,30 +135,19 @@ const TokenPage = () => {
     setTokenPool(pool);
   };
 
-  const fetchFeeParams = async () => {
-    const fee = await readContract(client, {
-      ...curveConfig,
-      functionName: "tradingFeeRate",
-    });
-    const denom = await readContract(client, {
-      ...curveConfig,
-      functionName: "FEE_DENOMINATOR",
-    });
-    setTradeFeeParams({ rate: fee.toString(), denom: denom.toString() });
-  };
-
   const fetchBalances = async () => {
-    if (client.account && token) {
+    if (address && token) {
+      // @ts-ignore
       const ethBalance = await getBalance(client, {
-        address: client.account?.address,
+        address: address,
       });
+      // @ts-ignore
       const tokenBalance = await readContract(client, {
         ...tokenConfig,
-        address: token.address as `0x${string}`,
+        address: token.address,
         functionName: "balanceOf",
-        args: [client.account.address],
+        args: [address],
       });
-
       setEthBalance(formatEther(ethBalance));
       setTokenBalance(formatEther(tokenBalance));
     }
@@ -175,96 +155,176 @@ const TokenPage = () => {
 
   useEffect(() => {
     if (token) {
-      fetchPool(token.address as `0x${string}`);
-      fetchBalances();
-      fetchFeeParams();
+      fetchPool(token.address);
     }
   }, [token]);
 
-  const { writeContract } = useWriteContract();
+  useEffect(() => {
+    if (address) {
+      fetchBalances();
+      setDisableBtn(false);
+    } else {
+      setEthBalance("0");
+      setTokenBalance("0");
+    }
+  }, [isConnected, token])
+
+  const handleError = (error: any) => {
+    console.log(error);
+    setShowFailModal(true);
+    setDisableBtn(false);
+    setBtnLoading(false);
+    setTimeout(() => {
+      setShowFailModal(false);
+    }, 3000);
+  }
+
+  const handleSuccess = async (hash: Address) => {
+    try {
+      // @ts-ignore
+      await waitForTransactionReceipt(client, {
+        hash
+      })
+      await refetchToken();
+      setTxnHash(hash);
+      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 5000);
+    } catch (e) {
+      handleError(e);
+    }
+    setDisableBtn(false);
+    setBtnLoading(false);
+  }
+
+  const handleApprovalSuccess = async (hash: Address) => {
+    // @ts-ignore
+    await waitForTransactionReceipt(client, {
+      hash
+    })
+    const amountOutMin =
+      parseEther(ethAmountOut) -
+      (parseEther(ethAmountOut) * BigInt(slippage)) / BigInt("100");
+    const { data } = await refetchBlock();
+    // sell tokens
+    await writeContractAsync({
+      ...curveConfig,
+      functionName: "swapTokensForEth",
+      args: [
+        token!.address,
+        parseEther(tokenAmountIn),
+        amountOutMin,
+        data!.timestamp + BigInt(1 * 60),
+      ],
+    },
+      {
+        onSuccess: async (hash) => {
+          await handleSuccess(hash);
+        },
+        onError: (e) => {
+          handleError(e.message);
+        }
+      }
+    );
+  }
 
   const handleBuy = async () => {
     setDisableBtn(true);
-
+    setBtnLoading(true);
     if (!token) {
       return;
     }
-    if (ethAmount != "0" && tokenAmount != "0" && block.data) {
+    if (ethAmountIn != "0" && tokenAmountOut != "0") {
+      const { data, error } = await refetchBlock();
+      if (!data) {
+        handleError(error);
+        setDisableBtn(true);
+        return
+      }
       const amountOutMin =
-        parseEther(tokenAmount) -
-        (parseEther(tokenAmount) * BigInt(slippage)) / BigInt("100");
-      await writeContract({
+        parseEther(tokenAmountOut) -
+        (parseEther(tokenAmountOut) * BigInt(slippage)) / BigInt("100");
+      await writeContractAsync({
         ...curveConfig,
         functionName: "swapEthForTokens",
         args: [
-          token.address as `0x${string}`,
-          parseEther(ethAmount),
+          token.address,
+          parseEther(ethAmountIn),
           amountOutMin,
-          block.data.timestamp + BigInt(1 * 60),
+          data.timestamp + BigInt(1 * 60),
         ],
         // @ts-ignore
-        value: parseEther(ethAmount),
+        value: parseEther(ethAmountIn),
+      }, {
+        onSuccess: async (data) => {
+          await handleSuccess(data)
+        },
+        onError: (error) => {
+          handleError(error.message);
+        },
       });
     }
-
-    setDisableBtn(false);
   };
 
   const handleSell = async () => {
     setDisableBtn(true);
+    setBtnLoading(true);
     if (!token) {
       return;
     }
-    if (ethAmount != "0" && tokenAmount != "0" && block.data) {
-      const amountOutMin =
-        parseEther(ethAmount) -
-        (parseEther(ethAmount) * BigInt(slippage)) / BigInt("100");
+    if (ethAmountOut != "0" && tokenAmountIn != "0") {
+      const { data, error } = await refetchBlock();
+      if (!data) {
+        handleError(error);
+        setDisableBtn(true);
+        return
+      }
       // Approve curve to send tokens
-      await writeContract({
+      await writeContractAsync({
         ...tokenConfig,
         functionName: "approve",
-        address: token.address as `0x${string}`,
-        args: [curveConfig.address, parseEther(tokenAmount)],
-      });
-      // sell tokens
-      await writeContract({
-        ...curveConfig,
-        functionName: "swapTokensForEth",
-        args: [
-          token.address as `0x${string}`,
-          parseEther(tokenAmount),
-          amountOutMin,
-          block.data.timestamp + BigInt(1 * 60),
-        ],
-      });
+        address: token.address,
+        args: [curveConfig.address, parseEther(tokenAmountIn)],
+      },
+      {
+        onSuccess: async (hash) => {
+          await handleApprovalSuccess(hash)
+        },
+        onError: (error) => {
+          handleError(error.message);
+        }
+      }
+    );
     }
-    setDisableBtn(false);
   };
 
   const handleChangeTokenAmountIn = async (amountIn: string) => {
-    if (!token || amountIn == "0") {
+    if (!token || amountIn == "0" || !amountIn) {
       return;
     }
+    // @ts-ignore
     const amountOut = await readContract(client, {
       ...curveConfig,
       functionName: "calcAmountOutFromToken",
-      args: [token.address as `0x${string}`, parseEther(amountIn)],
+      args: [token.address, parseEther(amountIn)],
     });
-    setTokenAmount(amountIn);
-    setEthAmount(formatEther(amountOut));
+    setTokenAmountIn(amountIn);
+    setEthAmountOut(formatEther(amountOut));
   };
 
   const handleChangeEthAmountIn = async (amountIn: string) => {
-    if (!token || amountIn == "0") {
+    if (!token || amountIn == "0" || !amountIn) {
       return;
     }
+    // @ts-ignore
     const amountOut = await readContract(client, {
       ...curveConfig,
       functionName: "calcAmountOutFromEth",
-      args: [token.address as `0x${string}`, parseEther(amountIn)],
+      args: [token.address, parseEther(amountIn)],
     });
-    setEthAmount(amountIn);
-    setTokenAmount(formatEther(amountOut));
+    setEthAmountIn(amountIn);
+    setTokenAmountOut(formatEther(amountOut));
   };
 
   const toggleBuy = () => {
@@ -301,12 +361,6 @@ const TokenPage = () => {
     }
   };
 
-  //Array to contain swap success messages
-  const swapSuccessMessages = {
-    mainMessage: "Swap Successful!",
-    subMessage: `Successfuly swapped 2ETH for 2000 DEez`,
-  };
-
   return (
     <div className="token-page">
       {token && tokenPool ? (
@@ -323,7 +377,7 @@ const TokenPage = () => {
                   {token.name} (ticker: {token.symbol})
                 </h2>
                 <p>
-                  {token.description}. Pepebox has a market size of{" "}
+                  {token.description}. {token.name} has a market size of {" "}
                   {formatEther(BigInt(token.marketCap))} ETH
                 </p>
                 <div className="creator-details">
@@ -331,7 +385,7 @@ const TokenPage = () => {
                     <img src="./assets/images/user.png" alt="" />
                     <p>
                       Created by{" "}
-                      <a href="#" target="blank" className="schwarzy">
+                      <a href={`${client.chain.blockExplorers.default.url}/address/${token.creator}`} target="_blank" className="schwarzy">
                         {truncate(token.creator)}
                       </a>
                     </p>
@@ -396,14 +450,12 @@ const TokenPage = () => {
                           />{" "}
                           <p className="wallet-bal-wrapper">
                             <img src="./assets/images/wallet.png " alt="" />
-                            <span>{ethBalance}</span>
+                            <span>{parseFloat(ethBalance).toFixed(4)}</span>
                           </p>
                         </div>
-                        {estRecieveAmt && (
-                          <p className="recieve-amount">
-                            You recieve <span>{estRecieveAmt} DEEZ</span>
-                          </p>
-                        )}
+                        <p className="recieve-amount">
+                          You recieve <span>{numberWithCommas(parseFloat(tokenAmountOut).toFixed(2))} {token.symbol}</span>
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -428,36 +480,47 @@ const TokenPage = () => {
                         />{" "}
                         <p className="wallet-bal-wrapper">
                           <img src="./assets/images/wallet.png " alt="" />
-                          <span>{tokenBalance}</span>
+                          <span>{numberWithCommas(parseFloat(tokenBalance).toFixed(2))}</span>
                         </p>{" "}
                       </div>
-                      {estRecieveAmt && (
-                        <p className="recieve-amount">
-                          You recieve <span>{estRecieveAmt} ETH </span>
-                        </p>
-                      )}
+                      <p className="recieve-amount">
+                        You recieve <span>{ethAmountOut} ETH </span>
+                      </p>
                     </div>
                   </div>
                 )}
 
-                {/* <button className="switch-token">
-                <img src="./assets/images/swap.png" alt="" />
-              </button> */}
+                <button className="switch-token">
+                  <img src="./assets/images/swap.png" alt="" />
+                </button>
               </div>
               <div className="btn-wrapper">
                 <button
-                  className={disableBtn ? "disabled-btn" : "trade-btn"}
+                  className={
+                    disableBtn || (buyActive && (ethAmountIn == "0" || !ethAmountIn)) || 
+                    (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn)) 
+                    ? "disabled-btn" : "trade-btn"
+                  }
                   onClick={buyActive ? handleBuy : handleSell}
                 >
-                  Place trade
+                  {
+                    btnLoading ? 
+                    <ClipLoader
+                        size={20}
+                        color={"#fff"}
+                        loading={btnLoading}
+                        aria-label="Loading Spinner"
+                    /> :
+                    <p>Place trade</p>
+                  }
                 </button>
-                <SuccessToast swapSuccessMessages={swapSuccessMessages} />
-                <FailedToasts />
+                { showSuccessModal ? <SuccessToast {...{message: "Trade sucessfully placed", hash: txnHash, url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`}} /> : <></> }
+                { showFailModal ? <FailedToasts /> : <></> }
               </div>
             </div>
           </section>
-          <section className="section2"></section>
-          <section className="section3">
+          {/* <section className="section2"></section> */}
+          {/* <section className="section3">
             <div className="section3-header">
               <h2>Trades</h2>{" "}
               <div>
@@ -487,10 +550,9 @@ const TokenPage = () => {
                 {trades.map((trade, index) => (
                   <TradeRow key={index} trade={trade} />
                 ))}
-                {/* <TradeRow /> */}
               </table>
             </div>
-          </section>
+          </section> */}
 
           {showSlippageModal && (
             <section className="slippage-wrapper">

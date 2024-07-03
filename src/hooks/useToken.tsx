@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { client } from '../utils/graphql';
 import { GET_TOKENS, GET_TOKEN } from '../utils/query';
+import { Address } from 'viem';
 
 interface Token {
   id: string;
-  address: string;
+  address: Address;
   chainId: number;
-  creator: string;
+  creator: Address;
   name: string;
   symbol: string;
   marketCap: string;
@@ -75,10 +76,14 @@ export const useToken = (id: string) => {
         setLoading(false);
       }
     };
+
+    const refetch = async () => {
+      await fetchToken(id);
+    }
   
     useEffect(() => {
       fetchToken(id);
     }, []);
   
-    return { token, loading, error };
+    return { token, loading, error, refetch };
   };

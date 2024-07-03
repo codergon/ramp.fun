@@ -1,6 +1,6 @@
 import { fraxtal, fraxtalTestnet } from "wagmi/chains";
 import { http, createConfig } from "wagmi";
-import { coinbaseWallet, metaMask, walletConnect } from "wagmi/connectors";
+import { coinbaseWallet } from "wagmi/connectors";
 
 const metadata = {
   name: "Ramp.fun",

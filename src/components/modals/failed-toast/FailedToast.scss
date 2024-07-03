@@ -1,4 +1,4 @@
-.success-toast-wrapper {
+.failed-toast-wrapper {
   padding: 10px 15px;
   background-color: #111111;
   display: flex;
@@ -10,7 +10,7 @@
   border: 1px solid #ec1e1e;
   border-radius: 20px;
 
-  .success-message {
+  .failed-message {
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -26,7 +26,7 @@
   }
 }
 
-.success-img-wrapper {
+.failed-img-wrapper {
   img {
     aspect-ratio: 1/1;
   }

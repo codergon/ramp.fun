@@ -72,16 +72,12 @@ const Topbar = () => {
             <>
               <div className="divider" />
 
-              {/* <p className="time-display">
-                {dayjs().tz("America/New_York").format("[New York,] HH:mm")}
-              </p> */}
-
-              <a target="_blank" href="https://twitter.com/thealpha_knight">
+              <a target="_blank" href="">
                 <p>TW</p>
                 <ArrowUpRight size={14} weight="bold" />
               </a>
 
-              <a target="_blank" href="https://github.com/codergon/ramp.fun">
+              <a target="_blank" href="">
                 <p>GH</p>
                 <ArrowUpRight size={14} weight="bold" />
               </a>
