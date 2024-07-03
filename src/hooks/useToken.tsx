@@ -66,6 +66,10 @@ export const useToken = (id: string) => {
     const fetchToken = async (id: string) => {
       setLoading(true);
       setError(null);
+      if (id == "") {
+        setLoading(false);
+        return
+    }
       try {
         const data = await client.request<TokenData>(GET_TOKEN, { id });
         setToken(data.token);

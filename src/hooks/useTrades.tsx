@@ -28,6 +28,10 @@ export const useTrades = (tokenId: String, orderBy: string, limit: number) => {
   const fetchTrades = async (tokenId: String, orderBy: string) => {
     setLoading(true);
     setError(null);
+    if (tokenId == "") {
+        setLoading(false);
+        return
+    }
     try {
       const data = await client.request<TradesData>(GET_TRADES, { orderBy, tokenId });
       setTrades((prevTrades) => [...prevTrades, ...data.trades.items]);
