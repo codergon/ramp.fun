@@ -226,7 +226,15 @@ const TokenPage = () => {
   };
 
   const handleChangeTokenAmountIn = async (amountIn: string) => {
-    if (!token || amountIn == "0" || !amountIn) {
+    if (!token || amountIn == "0") {
+      return;
+    }
+    if (!amountIn) {
+      setTokenAmountIn("0");
+      return;
+    }
+    if (parseInt(amountIn) < 0) {
+      setTokenAmountIn("0");
       return;
     }
     // @ts-ignore
@@ -240,7 +248,15 @@ const TokenPage = () => {
   };
 
   const handleChangeEthAmountIn = async (amountIn: string) => {
-    if (!token || amountIn == "0" || !amountIn) {
+    if (!token || amountIn == "0") {
+      return;
+    }
+    if (!amountIn) {
+      setEthAmountIn("0");
+      return;
+    }
+    if (parseInt(amountIn) < 0) {
+      setEthAmountIn("0");
       return;
     }
     // @ts-ignore
@@ -367,6 +383,7 @@ const TokenPage = () => {
                         <div className="amount-wrapper">
                           <input
                             type="number"
+                            min="0"
                             placeholder="0.0"
                             name="quantity"
                             id="qunatity"
@@ -427,6 +444,8 @@ const TokenPage = () => {
                     (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn)) 
                     ? "disabled-btn" : "trade-btn"
                   }
+                  disabled={disableBtn || (buyActive && (ethAmountIn == "0" || !ethAmountIn)) || 
+                    (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn)) ? true : false}
                   onClick={buyActive ? handleBuy : handleSell}
                 >
                   {
