@@ -36,7 +36,7 @@ const TokenPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
-  const { token, loading, refetch: refetchToken } = useToken(tokenId ? tokenId : "");
+  const { token, loading: tokenLoading, refetch: refetchToken } = useToken(tokenId ? tokenId : "");
   const { trades, refresh: refreshTrades } = useTrades(tokenId ? tokenId : "", "timestamp", 10);
   const [disableBtn, setDisableBtn] = useState(true);
   const [btnLoading, setBtnLoading] = useState(false);
@@ -237,13 +237,13 @@ const TokenPage = () => {
       setTokenAmountIn("0");
       return;
     }
+    setTokenAmountIn(amountIn);
     // @ts-ignore
     const amountOut = await readContract(client, {
       ...curveConfig,
       functionName: "calcAmountOutFromToken",
       args: [token.address, parseEther(amountIn)],
     });
-    setTokenAmountIn(amountIn);
     setEthAmountOut(formatEther(amountOut));
   };
 
@@ -459,8 +459,8 @@ const TokenPage = () => {
                     <p>Place trade</p>
                   }
                 </button>
-                { showSuccessModal ? <SuccessToast {...{message: "Trade sucessfully placed", hash: txnHash, url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`}} /> : <></> }
-                { showFailModal ? <FailedToasts /> : <></> }
+                { showSuccessModal && <SuccessToast {...{message: "Trade sucessfully placed", hash: txnHash, url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`}} /> }
+                { showFailModal && <FailedToasts /> }
               </div>
             </div>
           </section>
@@ -553,7 +553,7 @@ const TokenPage = () => {
           )}
         </div>
       ) : (
-        <EmptyState data={{ message: loading ? "Loading" : "Not found" }} />
+        <EmptyState data={{ message: tokenLoading ? "Loading" : "Not found" }} />
       )}
     </div>
   );
