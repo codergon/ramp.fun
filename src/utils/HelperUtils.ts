@@ -49,3 +49,26 @@ export function extractEthAddress(inputString: string) {
 export function numberWithCommas(input: string) {
   return input.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+export function formatDate(timestamp: string) {
+  const date: Date = new Date(parseInt(timestamp) * 1000);
+  const formattedDate: string = date.toLocaleString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+  return formattedDate
+}
+
+export function formatTime(timestamp: string) {
+  const date: Date = new Date(parseInt(timestamp) * 1000);
+
+  const formattedTime: string = date.toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+
+  return formattedTime;
+}

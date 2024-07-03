@@ -3,7 +3,7 @@ import { client } from '../utils/graphql';
 import { GET_TRADES } from '../utils/query';
 import { Address } from 'viem';
 
-interface Trade {
+export interface Trade {
   id: string;
   actor: Address;
   action: String;
@@ -51,5 +51,5 @@ export const useTrades = (tokenId: String, orderBy: string, limit: number) => {
     fetchTrades(tokenId, orderBy);
   }, [tokenId, orderBy, limit]);
 
-  return { trades, loading, error, refresh };
+  return { trades: trades.slice(0, 10), loading, error, refresh };
 };

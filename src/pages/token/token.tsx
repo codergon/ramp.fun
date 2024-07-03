@@ -12,82 +12,7 @@ import { curveConfig, tokenConfig } from "../../constants/data";
 import { getBalance, readContract, waitForTransactionReceipt } from "viem/actions";
 import SuccessToast from "../../components/modals/success-toast/successToast";
 import FailedToasts from "../../components/modals/failed-toast/FailedToast";
-
-const trades = [
-  {
-    type: "Bought",
-    time: "5:18pm",
-    account: "Schwazy",
-    sol: "0.01",
-    pepebox: "1.2k",
-    date: "July 5,2024",
-    transactions: "0xfshua...sgsag",
-  },
-  {
-    type: "Sold",
-    time: "5:18pm",
-    account: "Schwazy",
-    sol: "0.01",
-    pepebox: "1.2k",
-    date: "July 5,2024",
-    transactions: "0xfshua...sgsag",
-  },
-
-  {
-    type: "Sold",
-    time: "5:18pm",
-    account: "Schwazy",
-    sol: "0.01",
-    pepebox: "1.2k",
-    date: "July 5,2024",
-    transactions: "0xfshua...sgsag",
-  },
-  {
-    type: "Sold",
-    time: "5:18pm",
-    account: "Schwazy",
-    sol: "0.01",
-    pepebox: "1.2k",
-    date: "July 5,2024",
-    transactions: "0xfshua...sgsag",
-  },
-  {
-    type: "Bought",
-    time: "5:18pm",
-    account: "Schwazy",
-    sol: "0.01",
-    pepebox: "1.2k",
-    date: "July 5,2024",
-    transactions: "0xfshua...sgsag",
-  },
-  {
-    type: "Bought",
-    time: "5:18pm",
-    account: "Schwazy",
-    sol: "0.01",
-    pepebox: "1.2k",
-    date: "July 5,2024",
-    transactions: "0xfshua...sgsag",
-  },
-  {
-    type: "Bought",
-    time: "5:18pm",
-    account: "Schwazy",
-    sol: "0.01",
-    pepebox: "1.2k",
-    date: "July 5,2024",
-    transactions: "0xfshua...sgsag",
-  },
-  {
-    type: "Bought",
-    time: "5:18pm",
-    account: "Schwazy",
-    sol: "0.01",
-    pepebox: "1.2k",
-    date: "July 5,2024",
-    transactions: "0xfshua...sgsag",
-  },
-];
+import { useTrades } from "hooks/useTrades";
 
 interface TokenPool {
   token: Address;
@@ -112,6 +37,7 @@ const TokenPage = () => {
   const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const { token, loading, refetch: refetchToken } = useToken(tokenId ? tokenId : "");
+  const { trades, refresh: refreshTrades } = useTrades(tokenId ? tokenId : "", "timestamp", 10);
   const [disableBtn, setDisableBtn] = useState(true);
   const [btnLoading, setBtnLoading] = useState(false);
 
@@ -544,11 +470,11 @@ const TokenPage = () => {
                   <th>Account</th>
                   <th>ETH</th>
                   <th>{token.symbol}</th>
-                  <th>Date</th>
-                  <th className="border-radius2">Transactions</th>
+                  <th>Fee</th>
+                  <th className="border-radius2">Date</th>
                 </tr>
                 {trades.map((trade, index) => (
-                  <TradeRow key={index} trade={trade} />
+                  <TradeRow key={index} trade={trade} explorerUrl={client.chain.blockExplorers.default.url} />
                 ))}
               </table>
             </div>
