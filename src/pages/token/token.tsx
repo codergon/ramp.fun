@@ -18,8 +18,6 @@ import {
 import SuccessToast from "../../components/modals/success-toast/successToast";
 import FailedToasts from "../../components/modals/failed-toast/FailedToast";
 import { useTrades } from "hooks/useTrades";
-import CandlestickChart from "components/common/candleStick2/CandleStick";
-// import CandleStick from "components/common/candle-stick/CandleStick";
 
 interface TokenPool {
   token: Address;
@@ -44,7 +42,7 @@ const TokenPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
-  const [isTokenMigrated, setIsTokenMigrated] = useState(false);
+  const [isTokenMigrated, setIsTokenMigrated] = useState(true);
   const {
     token,
     loading: tokenLoading,
@@ -64,8 +62,8 @@ const TokenPage = () => {
   const { writeContractAsync } = useWriteContract();
 
   const fetchPoolAndMigrationThreshold = async (addr: Address) => {
-    // @ts-ignore
     const [{ result: tokenPoolResult }, { result: threshHold }] =
+      // @ts-ignore
       await multicall(client, {
         contracts: [
           {
@@ -85,8 +83,8 @@ const TokenPage = () => {
       migrated: tokenPoolResult![10],
     };
     setTokenPool(pool);
-    // @ts-ignore
     const curveProgress =
+    // @ts-ignore
       (formatEther(tokenPoolResult![3]) / formatEther(threshHold!)) * 100;
     setBondingPercentage(parseFloat(curveProgress.toString()).toFixed(4));
   };
@@ -397,15 +395,15 @@ const TokenPage = () => {
                 </div>
               </div>
             </div>
-            {isTokenMigrated ? (
+            {token.isMigrated ? (
               <div className=" migrated-wrapper">
                 <div className="migrated-text">
                   <h2>
-                    Token Migrated, Click the button below to view in Frax
+                    Token has been Migrated
                   </h2>
 
-                  <a href="#" target="blank">
-                    View in Frax
+                  <a href={`https://app.frax.finance/swap/main?from=${token.address}&to=native`} target="blank">
+                    Trade on FraxSwap
                   </a>
                 </div>
               </div>
@@ -642,25 +640,6 @@ const TokenPage = () => {
                       />
                     </div>
                   </div>
-                  {/* <div className="priority-fee-wrapper">
-                  <p>Priority fee</p>
-                  <div className="priority-fee-input">
-                    <div>
-                      <img src="./assets/images/sol.png" alt="" />
-                      <p>SOL</p>
-                    </div>{" "}
-                    <input
-                      type="number"
-                      name="priorityFee"
-                      id="priorityFee"
-                      placeholder="00"
-                    />
-                  </div>
-                  <p className="disclaimer">
-                    N.B: A higher priority fee accelerates transaction
-                    confirmations, paid to the Solana network for each trade.
-                  </p>
-                </div> */}
                   <button onClick={toggleSlippage} className="save-settings">
                     {" "}
                     Save Settings
