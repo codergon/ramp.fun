@@ -12,7 +12,7 @@ const metadata = {
 export const config = createConfig({
   chains: [fraxtal, fraxtalTestnet],
   connectors: [
-    coinbaseWallet({ appName: "Create Wagmi", preference: "eoaOnly" }),
+    coinbaseWallet({ appName: "Ramp.fun", preference: "smartWalletOnly" }),
   ],
   transports: {
     [fraxtal.id]: http(),
