@@ -88,7 +88,7 @@ const Topbar = () => {
                       }}
                       className="border-bottom"
                     >
-                      Devnet
+                      Testnet
                     </button>
                     <button
                       onClick={() => {
