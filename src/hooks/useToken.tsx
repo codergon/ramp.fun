@@ -41,7 +41,7 @@ export const useTokens = (chainId: number, orderBy: string, limit: number) => {
     setError(null);
     try {
       const data = await client.request<TokensData>(GET_TOKENS, { orderBy, chainId });
-      setTokens((prevTokens) => [...prevTokens, ...data.tokens.items]);
+      setTokens(data.tokens.items);
     } catch (err) {
         console.log(err);
       setError('An Error occured while fetching tokens...');
@@ -55,7 +55,7 @@ export const useTokens = (chainId: number, orderBy: string, limit: number) => {
     fetchTokens(chainId, orderBy);
   }, [chainId, orderBy, limit]);
 
-  return { tokens, loading, error };
+  return { tokens: tokens, loading, error };
 };
 
 export const useToken = (id: string) => {

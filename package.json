@@ -12,6 +12,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cloudinary/react": "^1.13.0",
+    "@cloudinary/url-gen": "^1.19.0",
     "@phosphor-icons/react": "^2.1.4",
     "@szhsin/react-accordion": "^1.2.4",
     "@szhsin/react-menu": "^4.1.0",
@@ -20,7 +22,8 @@
     "@types/graphql": "^14.5.0",
     "@web3modal/siwe": "^4.1.5",
     "@web3modal/wagmi": "^4.1.5",
-    "axios": "^1.6.8",
+    "axios": "^1.7.2",
+    "cloudinary": "^2.2.0",
     "dayjs": "^1.11.10",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "6.12.1",

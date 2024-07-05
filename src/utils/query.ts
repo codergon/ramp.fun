@@ -3,7 +3,7 @@ import { gql } from 'graphql-request';
 export const GET_TOKENS = gql`
   query MyQuery($orderBy: String, $chainId: Int) {
     tokens(
-      limit: 10
+      limit: 5
       orderBy: $orderBy
       orderDirection: "desc"
       where: { chainId: $chainId }
@@ -46,7 +46,7 @@ export const GET_TRADES = gql`query MyQuery($tokenId: String) {
     orderBy: "timestamp"
     orderDirection: "desc"
     where: {tokenId: $tokenId}
-    limit: 10
+    limit: 5
   ) {
     items {
       action

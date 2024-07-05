@@ -40,8 +40,8 @@ const TradeRow = ({ trade, explorerUrl } : { trade: Trade, explorerUrl: String }
       <td>
         {
           trade.action == "SELL" ? 
-          numberWithCommas(formatEther(BigInt(trade.amountIn.toString()))) : 
-          numberWithCommas(formatEther(BigInt(trade.amountOut.toString())))
+          numberWithCommas(parseFloat(formatEther(BigInt(trade.amountIn.toString()))).toFixed(2)) : 
+          numberWithCommas(parseFloat(formatEther(BigInt(trade.amountOut.toString()))).toFixed(2))
         }
       </td>
       <td>{parseFloat(formatEther(BigInt(trade.fee.toString()))).toFixed(8)}</td>

@@ -60,7 +60,11 @@ const Home = () => {
                     <NavLink key={index} className="token" to={`/${token.id}`}>
                       <div className="token-image">
                         <img
-                          src={`./assets/images/${((index + 1) % 6) + 1}.jpg`}
+                          src={
+                            token.logoUrl.slice(0, 5) == "https" ?
+                            token.logoUrl :
+                            `./assets/images/${((index + 1) % 6) + 1}.jpg`
+                          }
                           alt=""
                         />
                       </div>

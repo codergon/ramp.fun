@@ -1,14 +1,17 @@
 import "./create-token.scss";
 
 import { ClipLoader } from "react-spinners";
-import useAppObjMenu from "hooks/useAppObjMenu";
 import { useEffect, useRef, useState } from "react";
 import { Accordion, AccordionItem } from "@szhsin/react-accordion";
 import { CameraPlus, CaretDoubleRight, CaretUp } from "@phosphor-icons/react";
-import { useWriteContract, useReadContract } from "wagmi";
+import { useWriteContract, useReadContract, useClient } from "wagmi";
 import { curveConfig } from "../../constants/data";
 import SuccessToast from "components/modals/success-toast/successToast";
 import FailedToasts from "components/modals/failed-toast/FailedToast";
+
+import Axios from "axios";
+import { Address } from "viem";
+import { waitForTransactionReceipt } from "viem/actions";
 
 const CreateToken = () => {
   const [name, setName] = useState("");
@@ -20,21 +23,18 @@ const CreateToken = () => {
   const [website, setWebsite] = useState("");
   const [telegram, setTelegram] = useState("");
 
-  const { writeContract } = useWriteContract();
+  const [txnHash, setTxnHash] = useState("");
+
+  const { writeContractAsync } = useWriteContract();
   const creationFee = useReadContract({
     ...curveConfig,
     functionName: "creationFee",
   });
 
-  const [TokenMenu, selectedToken] = useAppObjMenu({
-    uppercase: true,
-    objecKey: "symbol",
-    toggleCallback: (val) => {},
-    items: [],
-  });
-
-  const [showFailModal, setShowFailModal] = useState(true);
+  const [showFailModal, setShowFailModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const client = useClient();
 
   // HANDLE IMAGE UPLOAD
   const imageRef = useRef<HTMLInputElement | null>(null);
@@ -45,29 +45,87 @@ const CreateToken = () => {
     if (!e.target.files || e.target.files.length === 0) return;
     setSelectedFile(e.target.files[0]);
   };
+  
+  const handleImageUpload = async (file: any) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET_NAME);
+    const data = await Axios.post(
+      `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_NAME}/image/upload`,
+      formData
+    );
+    if (data.status != 200) {
+      return null
+    }
+    return data.data["secure_url"];
+  }
+
+  const handleError = (error: any) => {
+    console.log(error);
+    setShowFailModal(true);
+    setLoading(false);
+    setTimeout(() => {
+      setShowFailModal(false);
+    }, 3000);
+  };
+
+  const handleSuccess = async (hash: Address) => {
+    try {
+      // @ts-ignore
+      await waitForTransactionReceipt(client, {
+        hash,
+      });
+      setTxnHash(hash);
+      setShowSuccessModal(true);
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 5000);
+    } catch (e) {
+      handleError(e);
+    }
+    setLoading(false);
+    setName("");
+    setDescription("");
+    setTicker("");
+    setPreview(undefined);
+    setSelectedFile(null);
+    setTwitter("");
+    setWebsite("");
+    setTelegram("");
+  };
 
   const handleCreateToken = async () => {
     if (name == "" || description == "" || ticker == "" || selectedFile == null)
       return;
     setLoading(true);
-    writeContract({
-      ...curveConfig,
-      functionName: "launchToken",
-      // @ts-ignore
-      value: creationFee.data ? creationFee.data : BigInt(0),
-      args: [
-        {
-          name,
-          description,
-          twitterLink: twitter,
-          telegramLink: telegram,
-          symbol: ticker,
-          website,
-          image: selectedFile.toString(),
+    const imageUrl = await handleImageUpload(selectedFile);
+    await writeContractAsync(
+      {
+        ...curveConfig,
+        functionName: "launchToken",
+        // @ts-ignore
+        value: creationFee.data ? creationFee.data : BigInt(0),
+        args: [
+          {
+            name,
+            description,
+            twitterLink: twitter,
+            telegramLink: telegram,
+            symbol: ticker,
+            website,
+            image: imageUrl,
+          },
+        ],
+      },
+      {
+        onSuccess: async (hash: Address) => {
+          await handleSuccess(hash);
         },
-      ],
-    });
-    setLoading(false);
+        onError: (error) => {
+          handleError(error.message);
+        }
+      }
+    );
   };
 
   useEffect(() => {

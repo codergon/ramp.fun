@@ -24,7 +24,7 @@ function App() {
     const handleLoading = setTimeout(() => {
       setLoading(false);
 
-      const duration = 0.5;
+      const duration = 0.3;
       const tl = gsap.timeline();
 
       gsap.fromTo(
@@ -45,7 +45,7 @@ function App() {
         duration,
         opacity: 1,
       });
-    }, 1.5 * 1000);
+    }, 0.9 * 1000);
 
     return () => clearTimeout(handleLoading);
   }, [location]);

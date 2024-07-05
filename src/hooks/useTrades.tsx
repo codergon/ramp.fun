@@ -34,7 +34,7 @@ export const useTrades = (tokenId: String, orderBy: string, limit: number) => {
     }
     try {
       const data = await client.request<TradesData>(GET_TRADES, { orderBy, tokenId });
-      setTrades((prevTrades) => [...prevTrades, ...data.trades.items]);
+      setTrades(data.trades.items);
     } catch (err) {
         console.log(err);
       setError('An Error occured while fetching tokens...');
@@ -51,5 +51,5 @@ export const useTrades = (tokenId: String, orderBy: string, limit: number) => {
     fetchTrades(tokenId, orderBy);
   }, [tokenId, orderBy, limit]);
 
-  return { trades: trades.slice(0, 10), loading, error, refresh };
+  return { trades: trades, loading, error, refresh };
 };

@@ -11,6 +11,7 @@ import { useWriteContract, useClient, useBlock, useAccount } from "wagmi";
 import { curveConfig, tokenConfig } from "../../constants/data";
 import {
   getBalance,
+  multicall,
   readContract,
   waitForTransactionReceipt,
 } from "viem/actions";
@@ -29,6 +30,7 @@ const TokenPage = () => {
   const [buyActive, setBuyActive] = useState(true);
   const [sellActive, setSellActive] = useState(false);
   const [tokenPool, setTokenPool] = useState<TokenPool>();
+  const [bondingPercentage, setBondingPercentage] = useState("0");
   const [ethAmountIn, setEthAmountIn] = useState("0");
   const [ethAmountOut, setEthAmountOut] = useState("0");
   const [tokenAmountIn, setTokenAmountIn] = useState("0");
@@ -36,7 +38,7 @@ const TokenPage = () => {
   const [ethBalance, setEthBalance] = useState("0");
   const [tokenBalance, setTokenBalance] = useState("0");
   const [slippage, setSlippage] = useState("2");
-  const [showFailModal, setShowFailModal] = useState(true);
+  const [showFailModal, setShowFailModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
@@ -58,19 +60,30 @@ const TokenPage = () => {
   const { refetch: refetchBlock } = useBlock();
   const { writeContractAsync } = useWriteContract();
 
-  const fetchPool = async (addr: Address) => {
+  const fetchPoolAndMigrationThreshold = async (addr: Address) => {
     // @ts-ignore
-    const result = await readContract(client, {
-      ...curveConfig,
-      functionName: "tokenPool",
-      args: [addr],
-    });
+    const [{ result: tokenPoolResult }, { result: threshHold }] = await multicall(client, {
+      contracts: [
+        {
+          ...curveConfig,
+          functionName: "tokenPool",
+          args: [addr],
+        },
+        {
+          ...curveConfig,
+          functionName: "migrationThreshold",
+        }
+      ]
+    })
     const pool: TokenPool = {
-      token: result[0],
-      lastPrice: result[5],
-      migrated: result[10],
+      token: tokenPoolResult![0],
+      lastPrice: tokenPoolResult![5],
+      migrated: tokenPoolResult![10],
     };
     setTokenPool(pool);
+    // @ts-ignore
+    const curveProgress = (formatEther(tokenPoolResult![3]) / formatEther(threshHold!)) * 100;
+    setBondingPercentage(parseFloat(curveProgress.toString()).toFixed(4));
   };
 
   const fetchBalances = async () => {
@@ -91,11 +104,9 @@ const TokenPage = () => {
     }
   };
 
-  const [bondingPercentage, setBondingPercentage] = useState(20);
-
   useEffect(() => {
     if (token) {
-      fetchPool(token.address);
+      fetchPoolAndMigrationThreshold(token.address);
     }
   }, [token]);
 
@@ -126,6 +137,7 @@ const TokenPage = () => {
         hash,
       });
       await refetchToken();
+      await refreshTrades();
       setTxnHash(hash);
       setShowSuccessModal(true);
       setTimeout(() => {
@@ -304,11 +316,11 @@ const TokenPage = () => {
 
   //function to copy token creator to clipboard
   const [copied, setCopied] = useState(false);
-  const handleCopyTokenCreator = async () => {
+  const handleCopyTokenAddress = async () => {
     setCopied(false);
-    if (token?.creator) {
+    if (token?.address) {
       try {
-        await navigator.clipboard.writeText(token.creator);
+        await navigator.clipboard.writeText(token.address);
         setCopied(true);
         setTimeout(() => {
           setCopied(false);
@@ -318,7 +330,7 @@ const TokenPage = () => {
         setCopied(false);
       }
     } else {
-      alert("No token creator found");
+      alert("No token address found");
     }
   };
 
@@ -330,7 +342,13 @@ const TokenPage = () => {
             <div className="section1-left">
               <img
                 className="tokenImg"
-                src="./assets/images/tokenImg1.png"
+                src={
+                  token.logoUrl.slice(0, 5) == "https" ?
+                  token.logoUrl :
+                  "./assets/images/tokenImg1.png"
+                }
+                height={"260px"}
+                style={{ borderRadius: "15px" }}
                 alt=""
               />
               <div className="text-wrapper">
@@ -356,11 +374,11 @@ const TokenPage = () => {
                     </p>
                   </div>
                   <div
-                    onClick={handleCopyTokenCreator}
+                    onClick={handleCopyTokenAddress}
                     className="creator-address"
                   >
                     <img src="./assets/images/copy.png" alt="" />
-                    <p>{truncate(token.creator)}</p>
+                    <p>{truncate(token.address)}</p>
                     {copied && <p className="address-copied">Address copied</p>}
                   </div>
                 </div>
@@ -517,7 +535,7 @@ const TokenPage = () => {
                   </div>
                 )}
                 <div className="bonding-curve-wrapper">
-                  <p>Bonding Curve: {bondingPercentage}%</p>
+                  <p>Bonding Curve Progress: {bondingPercentage}%</p>
                   <div className="bonding-curve-loader">
                     <div
                       style={{

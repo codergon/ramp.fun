@@ -44,14 +44,15 @@ const Topbar = () => {
       </div>
 
       <div className="c-topbar">
-        <div className="c-topbar__logo">
-          ramp.fun
-          <div className="icon">
-            <WaveSine size={28} weight="bold" mirrored />
+        <a href="/">
+          <div className="c-topbar__logo">
+            ramp.fun
+            <div className="icon">
+              <WaveSine size={28} weight="bold" mirrored />
+            </div>
           </div>
-        </div>
-
-
+        </a>
+        
         <div className="c-topbar__block">
           {address ? (
             <div className="acct-display">
