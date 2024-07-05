@@ -1,10 +1,9 @@
 import "./topbar.scss";
-import dayjs from "dayjs";
 import { useWindowSize } from "react-use";
 import { truncate } from "utils/HelperUtils";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WalletIcon from "components/common/wallet-icon";
-import { useAccount, useEnsAvatar, useEnsName, useSwitchChain, useDisconnect } from "wagmi";
+import { useAccount, useEnsAvatar, useEnsName, useSwitchChain, useDisconnect, useChainId } from "wagmi";
 import { ArrowUpRight, Eye, WaveSine } from "@phosphor-icons/react";
 import { useState } from "react";
 
@@ -24,6 +23,7 @@ const Topbar = () => {
   const { chains, switchChain } = useSwitchChain();
   const { disconnect } = useDisconnect();
   const [showNetworkDrop, setShowNetworkDrop] = useState(false);
+  const currentChain = useChainId();
 
   return (
     <>
@@ -78,11 +78,13 @@ const Topbar = () => {
                       chains.map((chain) => (
                         <button
                           key={chain.id}
+                          disabled={currentChain == chain.id ? true : false}
                           onClick={() => {
                             switchChain({ chainId: chain.id as 252 | 2522 })
                             setShowNetworkDrop(false);
                           }}
                           className="border-bottom"
+                          style={currentChain == chain.id ? {background: "#333"} : {}}
                         >
                           {chain.name}
                         </button>
