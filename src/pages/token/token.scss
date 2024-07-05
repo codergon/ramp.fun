@@ -38,6 +38,38 @@ $desktop: 1024px;
   width: 100%;
 }
 
+.migrated-wrapper {
+  background-color: #121212;
+  padding: 36px;
+  border: 1px solid #181818;
+  border-radius: 40px;
+  max-width: 612px;
+  width: 100%;
+  display: grid;
+  place-items: center;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    h2 {
+      text-align: center;
+      width: 100%;
+    }
+    a {
+      background-color: #e4cce1;
+
+      padding: 12px 20px;
+      text-align: center;
+      color: #111111;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+  }
+}
+
 .tokenImg {
   max-width: 540px;
   width: 100%;

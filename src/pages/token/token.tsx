@@ -18,6 +18,8 @@ import {
 import SuccessToast from "../../components/modals/success-toast/successToast";
 import FailedToasts from "../../components/modals/failed-toast/FailedToast";
 import { useTrades } from "hooks/useTrades";
+import CandlestickChart from "components/common/candleStick2/CandleStick";
+// import CandleStick from "components/common/candle-stick/CandleStick";
 
 interface TokenPool {
   token: Address;
@@ -42,6 +44,7 @@ const TokenPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
+  const [isTokenMigrated, setIsTokenMigrated] = useState(false);
   const {
     token,
     loading: tokenLoading,
@@ -62,19 +65,20 @@ const TokenPage = () => {
 
   const fetchPoolAndMigrationThreshold = async (addr: Address) => {
     // @ts-ignore
-    const [{ result: tokenPoolResult }, { result: threshHold }] = await multicall(client, {
-      contracts: [
-        {
-          ...curveConfig,
-          functionName: "tokenPool",
-          args: [addr],
-        },
-        {
-          ...curveConfig,
-          functionName: "migrationThreshold",
-        }
-      ]
-    })
+    const [{ result: tokenPoolResult }, { result: threshHold }] =
+      await multicall(client, {
+        contracts: [
+          {
+            ...curveConfig,
+            functionName: "tokenPool",
+            args: [addr],
+          },
+          {
+            ...curveConfig,
+            functionName: "migrationThreshold",
+          },
+        ],
+      });
     const pool: TokenPool = {
       token: tokenPoolResult![0],
       lastPrice: tokenPoolResult![5],
@@ -82,7 +86,8 @@ const TokenPage = () => {
     };
     setTokenPool(pool);
     // @ts-ignore
-    const curveProgress = (formatEther(tokenPoolResult![3]) / formatEther(threshHold!)) * 100;
+    const curveProgress =
+      (formatEther(tokenPoolResult![3]) / formatEther(threshHold!)) * 100;
     setBondingPercentage(parseFloat(curveProgress.toString()).toFixed(4));
   };
 
@@ -334,6 +339,14 @@ const TokenPage = () => {
     }
   };
 
+  //Candlecharts data
+  const data = [
+    { t: "2023-07-01T00:00:00Z", o: 100, h: 110, l: 90, c: 105 },
+    // { t: "2023-07-02T00:00:00Z", o: 105, h: 115, l: 100, c: 110 },
+    // { t: "2023-07-03T00:00:00Z", o: 110, h: 120, l: 105, c: 115 },
+    // Add more data points as needed
+  ];
+
   return (
     <div className="token-page">
       {token && tokenPool ? (
@@ -343,9 +356,9 @@ const TokenPage = () => {
               <img
                 className="tokenImg"
                 src={
-                  token.logoUrl.slice(0, 5) == "https" ?
-                  token.logoUrl :
-                  "./assets/images/tokenImg1.png"
+                  token.logoUrl.slice(0, 5) == "https"
+                    ? token.logoUrl
+                    : "./assets/images/tokenImg1.png"
                 }
                 height={"260px"}
                 style={{ borderRadius: "15px" }}
@@ -384,170 +397,188 @@ const TokenPage = () => {
                 </div>
               </div>
             </div>
-            <div className="section1-right">
-              <div className="position">
-                <div className=" buy-sell-wrapper">
-                  <button
-                    onClick={toggleBuy}
-                    className={buyActive ? "buy activePosition" : "buy"}
-                  >
-                    Buy
-                  </button>
-                  <button
-                    onClick={toggleSell}
-                    className={sellActive ? "sell activePosition" : "sell"}
-                  >
-                    Sell
+            {isTokenMigrated ? (
+              <div className=" migrated-wrapper">
+                <div className="migrated-text">
+                  <h2>
+                    Token Migrated, Click the button below to view in Frax
+                  </h2>
+
+                  <a href="#" target="blank">
+                    View in Frax
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div className="section1-right">
+                <div className="position">
+                  <div className=" buy-sell-wrapper">
+                    <button
+                      onClick={toggleBuy}
+                      className={buyActive ? "buy activePosition" : "buy"}
+                    >
+                      Buy
+                    </button>
+                    <button
+                      onClick={toggleSell}
+                      className={sellActive ? "sell activePosition" : "sell"}
+                    >
+                      Sell
+                    </button>
+                  </div>
+                  <button onClick={toggleSlippage} className="slippage">
+                    <img src="./assets/images/settings.png" alt="" />{" "}
+                    <p>Set max slippage</p>
                   </button>
                 </div>
-                <button onClick={toggleSlippage} className="slippage">
-                  <img src="./assets/images/settings.png" alt="" />{" "}
-                  <p>Set max slippage</p>
-                </button>
-              </div>
-              <div className="swap-box">
-                {buyActive ? (
-                  <div>
-                    <div className="from-token">
+                <div className="swap-box">
+                  {buyActive ? (
+                    <div>
+                      <div className="from-token">
+                        <div>
+                          <button className="from-token-btn">
+                            <img
+                              src="./assets/images/eth.png"
+                              height="20"
+                              alt=""
+                            />
+                            <p>ETH</p>
+                            {/* <img src="./assets/images/arrowDown.png" alt="" /> */}
+                          </button>
+                        </div>
+                        <div className="amount-container">
+                          <div className="amount-wrapper">
+                            <input
+                              type="number"
+                              min="0"
+                              placeholder="0.0"
+                              name="quantity"
+                              id="qunatity"
+                              onChange={(e) =>
+                                handleChangeEthAmountIn(e.target.value)
+                              }
+                            />{" "}
+                            <p className="wallet-bal-wrapper">
+                              <img src="./assets/images/wallet.png " alt="" />
+                              <span>{parseFloat(ethBalance).toFixed(4)}</span>
+                            </p>
+                          </div>
+                          <p className="recieve-amount">
+                            You recieve{" "}
+                            <span>
+                              {numberWithCommas(
+                                parseFloat(tokenAmountOut).toFixed(2)
+                              )}{" "}
+                              {token.symbol}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="to-token">
                       <div>
                         <button className="from-token-btn">
-                          <img
-                            src="./assets/images/eth.png"
-                            height="20"
-                            alt=""
-                          />
-                          <p>ETH</p>
-                          {/* <img src="./assets/images/arrowDown.png" alt="" /> */}
+                          <img src="./assets/images/3 2.png" alt="" />
+                          <p>{token.symbol}</p>
                         </button>
                       </div>
                       <div className="amount-container">
                         <div className="amount-wrapper">
                           <input
                             type="number"
-                            min="0"
                             placeholder="0.0"
                             name="quantity"
                             id="qunatity"
                             onChange={(e) =>
-                              handleChangeEthAmountIn(e.target.value)
+                              handleChangeTokenAmountIn(e.target.value)
                             }
                           />{" "}
                           <p className="wallet-bal-wrapper">
                             <img src="./assets/images/wallet.png " alt="" />
-                            <span>{parseFloat(ethBalance).toFixed(4)}</span>
-                          </p>
+                            <span>
+                              {numberWithCommas(
+                                parseFloat(tokenBalance).toFixed(2)
+                              )}
+                            </span>
+                          </p>{" "}
                         </div>
                         <p className="recieve-amount">
-                          You recieve{" "}
-                          <span>
-                            {numberWithCommas(
-                              parseFloat(tokenAmountOut).toFixed(2)
-                            )}{" "}
-                            {token.symbol}
-                          </span>
+                          You recieve <span>{ethAmountOut} ETH </span>
                         </p>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="to-token">
-                    <div>
-                      <button className="from-token-btn">
-                        <img src="./assets/images/3 2.png" alt="" />
-                        <p>{token.symbol}</p>
-                      </button>
-                    </div>
-                    <div className="amount-container">
-                      <div className="amount-wrapper">
-                        <input
-                          type="number"
-                          placeholder="0.0"
-                          name="quantity"
-                          id="qunatity"
-                          onChange={(e) =>
-                            handleChangeTokenAmountIn(e.target.value)
-                          }
-                        />{" "}
-                        <p className="wallet-bal-wrapper">
-                          <img src="./assets/images/wallet.png " alt="" />
-                          <span>
-                            {numberWithCommas(
-                              parseFloat(tokenBalance).toFixed(2)
-                            )}
-                          </span>
-                        </p>{" "}
-                      </div>
-                      <p className="recieve-amount">
-                        You recieve <span>{ethAmountOut} ETH </span>
-                      </p>
-                    </div>
-                  </div>
-                )}
+                  )}
 
-                {/* <button className="switch-token">
+                  {/* <button className="switch-token">
                   <img src="./assets/images/swap.png" alt="" />
                 </button> */}
-              </div>
-              <div className="btn-wrapper">
-                <button
-                  className={
-                    disableBtn ||
-                    (buyActive && (ethAmountIn == "0" || !ethAmountIn)) ||
-                    (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn))
-                      ? "disabled-btn"
-                      : "trade-btn"
-                  }
-                  disabled={
-                    disableBtn ||
-                    (buyActive && (ethAmountIn == "0" || !ethAmountIn)) ||
-                    (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn))
-                      ? true
-                      : false
-                  }
-                  onClick={buyActive ? handleBuy : handleSell}
-                >
-                  {btnLoading ? (
-                    <ClipLoader
-                      size={20}
-                      color={"#fff"}
-                      loading={btnLoading}
-                      aria-label="Loading Spinner"
-                    />
-                  ) : (
-                    <p>Place trade</p>
-                  )}
-                </button>
+                </div>
+                <div className="btn-wrapper">
+                  <button
+                    className={
+                      disableBtn ||
+                      (buyActive && (ethAmountIn == "0" || !ethAmountIn)) ||
+                      (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn))
+                        ? "disabled-btn"
+                        : "trade-btn"
+                    }
+                    disabled={
+                      disableBtn ||
+                      (buyActive && (ethAmountIn == "0" || !ethAmountIn)) ||
+                      (!buyActive && (tokenAmountIn == "0" || !tokenAmountIn))
+                        ? true
+                        : false
+                    }
+                    onClick={buyActive ? handleBuy : handleSell}
+                  >
+                    {btnLoading ? (
+                      <ClipLoader
+                        size={20}
+                        color={"#fff"}
+                        loading={btnLoading}
+                        aria-label="Loading Spinner"
+                      />
+                    ) : (
+                      <p>Place trade</p>
+                    )}
+                  </button>
 
-                {showSuccessModal && (
-                  <div className="marginTop">
-                    <SuccessToast
-                      {...{
-                        message: "Trade sucessfully placed",
-                        hash: txnHash,
-                        url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`,
-                      }}
-                    />
-                  </div>
-                )}
-                {showFailModal && (
-                  <div className="marginTop">
-                    <FailedToasts />
-                  </div>
-                )}
-                <div className="bonding-curve-wrapper">
-                  <p>Bonding Curve Progress: {bondingPercentage}%</p>
-                  <div className="bonding-curve-loader">
-                    <div
-                      style={{
-                        width: `${bondingPercentage}%`,
-                      }}
-                    ></div>
+                  {showSuccessModal && (
+                    <div className="marginTop">
+                      <SuccessToast
+                        {...{
+                          message: "Trade sucessfully placed",
+                          hash: txnHash,
+                          url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`,
+                        }}
+                      />
+                    </div>
+                  )}
+                  {showFailModal && (
+                    <div className="marginTop">
+                      <FailedToasts />
+                    </div>
+                  )}
+                  <div className="bonding-curve-wrapper">
+                    <p>Bonding Curve Progress: {bondingPercentage}%</p>
+                    <div className="bonding-curve-loader">
+                      <div
+                        style={{
+                          width: `${bondingPercentage}%`,
+                        }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </section>
-          {/* <section className="section2"></section> */}
+          {/* <section className="section2">
+            <h1>Candlestick Chart</h1>
+            <CandlestickChart />
+            <CandleStick data={data} /> 
+          </section> */}
           <section className="section3">
             <div className="section3-header">
               <h2>Trades</h2>{" "}
