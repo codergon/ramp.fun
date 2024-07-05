@@ -468,7 +468,7 @@ const TokenPage = () => {
                     <div className="to-token">
                       <div>
                         <button className="from-token-btn">
-                          <img src="./assets/images/3 2.png" alt="" />
+                          <img src={token.logoUrl} height="20" width="20" style={{ borderRadius: "50%" }} alt="" />
                           <p>{token.symbol}</p>
                         </button>
                       </div>
