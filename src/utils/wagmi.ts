@@ -1,6 +1,6 @@
 import { fraxtal, fraxtalTestnet } from "wagmi/chains";
 import { http, createConfig } from "wagmi";
-import { coinbaseWallet } from "wagmi/connectors";
+import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 
 const metadata = {
   name: "Ramp.fun",
@@ -12,7 +12,13 @@ const metadata = {
 export const config = createConfig({
   chains: [fraxtal, fraxtalTestnet],
   connectors: [
-    coinbaseWallet({ appName: "Ramp.fun", preference: "smartWalletOnly" }),
+    injected(),
+    coinbaseWallet({ appName: "Ramp.fun", preference: "eoaOnly" }),
+    walletConnect({
+      metadata,
+      showQrModal: false,
+      projectId: import.meta.env.VITE_WC_PROJECT_ID,
+    }),
   ],
   transports: {
     [fraxtal.id]: http(),
