@@ -4,7 +4,7 @@ import { useWindowSize } from "react-use";
 import { truncate } from "utils/HelperUtils";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WalletIcon from "components/common/wallet-icon";
-import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
+import { useAccount, useEnsAvatar, useEnsName, useSwitchChain, useDisconnect } from "wagmi";
 import { ArrowUpRight, Eye, WaveSine } from "@phosphor-icons/react";
 import { useState } from "react";
 
@@ -21,6 +21,8 @@ const Topbar = () => {
   });
 
   const { width } = useWindowSize();
+  const { chains, switchChain } = useSwitchChain();
+  const { disconnect } = useDisconnect();
   const [showNetworkDrop, setShowNetworkDrop] = useState(false);
 
   return (
@@ -72,27 +74,23 @@ const Topbar = () => {
               {showNetworkDrop && (
                 <div className="dropdown-wrapper">
                   <div className="dropdown-container">
+                    {
+                      chains.map((chain) => (
+                        <button
+                          key={chain.id}
+                          onClick={() => {
+                            switchChain({ chainId: chain.id as 252 | 2522 })
+                            setShowNetworkDrop(false);
+                          }}
+                          className="border-bottom"
+                        >
+                          {chain.name}
+                        </button>
+                      ))
+                    }
                     <button
                       onClick={() => {
-                        // handleChangeNetwork(Network.MAINNET);
-                        setShowNetworkDrop(false);
-                      }}
-                      className="border-bottom"
-                    >
-                      Mainnet
-                    </button>
-                    <button
-                      onClick={() => {
-                        // handleChangeNetwork(Network.MAINNET);
-                        setShowNetworkDrop(false);
-                      }}
-                      className="border-bottom"
-                    >
-                      Testnet
-                    </button>
-                    <button
-                      onClick={() => {
-                        // handleChangeNetwork(Network.MAINNET);
+                        disconnect();
                         setShowNetworkDrop(false);
                       }}
                     >
