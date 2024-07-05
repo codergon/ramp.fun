@@ -42,7 +42,6 @@ const TokenPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
-  const [isTokenMigrated, setIsTokenMigrated] = useState(true);
   const {
     token,
     loading: tokenLoading,
@@ -336,14 +335,6 @@ const TokenPage = () => {
       alert("No token address found");
     }
   };
-
-  //Candlecharts data
-  const data = [
-    { t: "2023-07-01T00:00:00Z", o: 100, h: 110, l: 90, c: 105 },
-    // { t: "2023-07-02T00:00:00Z", o: 105, h: 115, l: 100, c: 110 },
-    // { t: "2023-07-03T00:00:00Z", o: 110, h: 120, l: 105, c: 115 },
-    // Add more data points as needed
-  ];
 
   return (
     <div className="token-page">

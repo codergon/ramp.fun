@@ -47,17 +47,22 @@ const CreateToken = () => {
   };
   
   const handleImageUpload = async (file: any) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET_NAME);
-    const data = await Axios.post(
-      `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_NAME}/image/upload`,
-      formData
-    );
-    if (data.status != 200) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET_NAME);
+      const data = await Axios.post(
+        `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_NAME}/image/upload`,
+        formData
+      );
+      if (data.status != 200) {
+        return null
+      }
+      return data.data["secure_url"];
+    } catch (e) {
+      console.log(e);
       return null
     }
-    return data.data["secure_url"];
   }
 
   const handleError = (error: any) => {
@@ -99,6 +104,10 @@ const CreateToken = () => {
       return;
     setLoading(true);
     const imageUrl = await handleImageUpload(selectedFile);
+    if (!imageUrl) {
+      handleError("Failed to upload image");
+      return
+    }
     await writeContractAsync(
       {
         ...curveConfig,
