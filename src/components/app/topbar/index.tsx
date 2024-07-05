@@ -6,6 +6,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WalletIcon from "components/common/wallet-icon";
 import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import { ArrowUpRight, Eye, WaveSine } from "@phosphor-icons/react";
+import { useState } from "react";
 
 const Topbar = () => {
   const { open } = useWeb3Modal();
@@ -20,6 +21,7 @@ const Topbar = () => {
   });
 
   const { width } = useWindowSize();
+  const [showNetworkDrop, setShowNetworkDrop] = useState(false);
 
   return (
     <>
@@ -52,8 +54,56 @@ const Topbar = () => {
             </div>
           </div>
         </a>
-        
+
         <div className="c-topbar__block">
+          {address && (
+            <div
+              onMouseEnter={() => setShowNetworkDrop(true)}
+              onMouseLeave={() => setShowNetworkDrop(!showNetworkDrop)}
+              className="frax-network"
+            >
+              <button className="logo">
+                <img
+                  className=""
+                  src="./assets/images/frax.png"
+                  alt="frax-logo"
+                />
+              </button>
+              {showNetworkDrop && (
+                <div className="dropdown-wrapper">
+                  <div className="dropdown-container">
+                    <button
+                      onClick={() => {
+                        // handleChangeNetwork(Network.MAINNET);
+                        setShowNetworkDrop(false);
+                      }}
+                      className="border-bottom"
+                    >
+                      Mainnet
+                    </button>
+                    <button
+                      onClick={() => {
+                        // handleChangeNetwork(Network.MAINNET);
+                        setShowNetworkDrop(false);
+                      }}
+                      className="border-bottom"
+                    >
+                      Devnet
+                    </button>
+                    <button
+                      onClick={() => {
+                        // handleChangeNetwork(Network.MAINNET);
+                        setShowNetworkDrop(false);
+                      }}
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {address ? (
             <div className="acct-display">
               {!!avatar ? (
