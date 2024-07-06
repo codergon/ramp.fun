@@ -14,7 +14,11 @@ import { formatEther } from "viem";
 
 const Home = () => {
   const { chainId } = useAccount();
-  const { tokens, loading, error} = useTokens(chainId ? chainId : fraxtalTestnet.id, "timestamp", 10);
+  const { tokens, loading, error } = useTokens(
+    chainId ? chainId : fraxtalTestnet.id,
+    "timestamp",
+    10,
+  );
 
   return (
     <>
@@ -48,53 +52,57 @@ const Home = () => {
               </button>
             </div>
           </div>
-          {
-            loading 
-            ?
+          {loading ? (
             <EmptyState />
-            :
+          ) : (
             <div className="tokens-grid">
-              {tokens
-                .map((token, index) => {
-                  return (
-                    <NavLink key={index} className="token" to={`/${token.id}`}>
-                      <div className="token-image">
-                        <img
-                          src={
-                            token.logoUrl.slice(0, 5) == "https" ?
-                            token.logoUrl :
-                            `./assets/images/${((index + 1) % 6) + 1}.jpg`
-                          }
-                          alt=""
-                        />
-                      </div>
+              {tokens.map((token, index) => {
+                return (
+                  <NavLink key={index} className="token" to={`/${token.id}`}>
+                    <div className="token-image">
+                      <img
+                        src={
+                          token.logoUrl.slice(0, 5) == "https"
+                            ? token.logoUrl
+                            : `./assets/images/${((index + 1) % 6) + 1}.jpg`
+                        }
+                        alt=""
+                      />
+                    </div>
 
-                      <div className="token-details">
-                        <div className="token-details--info">
-                          <div className="name">{token.name} (ticker: {token.symbol})</div>
+                    <div className="token-details">
+                      <div className="token-details--info">
+                        <div className="name">
+                          {token.name} (${token.symbol})
+                        </div>
 
-                          <div className="stats">
-                            <div className="stat">
-                              <div className="label">market cap</div>
-                              <div className="value market-cap">{formatEther(BigInt(token.marketCap))} ETH</div>
-                            </div>
-                            •
-                            <div className="stat">
-                              <div className="label">created by</div>
-                              <div className="value">{truncate(token.creator)}</div>
+                        <div className="stats">
+                          <div className="stat">
+                            <div className="label">market cap</div>
+                            <div className="value market-cap">
+                              {parseFloat(
+                                formatEther(BigInt(token.marketCap)),
+                              ).toFixed(5)}
+                              Ξ
                             </div>
                           </div>
-
-                          <div className="description">
-                            {token.description}
+                          •
+                          <div className="stat">
+                            <div className="label">created by</div>
+                            <div className="value">
+                              {truncate(token.creator)}
+                            </div>
                           </div>
                         </div>
+
+                        <div className="description">{token.description}</div>
                       </div>
-                    </NavLink>
-                  );
-                })}
+                    </div>
+                  </NavLink>
+                );
+              })}
             </div>
-          }
+          )}
         </div>
       </div>
 

@@ -1,23 +1,33 @@
-import TradeRow from "components/common/trades-row/tradeRow";
-import { ClipLoader } from "react-spinners";
 import "./token.scss";
-import { useParams } from "react-router-dom";
+import { toast } from "sonner";
+import { useTrades } from "hooks/useTrades";
+import { ClipLoader } from "react-spinners";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useToken } from "../../hooks/useToken";
 import EmptyState from "components/common/empty-state";
-import { numberWithCommas, truncate } from "utils/HelperUtils";
 import { Address, formatEther, parseEther } from "viem";
-import { useWriteContract, useClient, useBlock, useAccount } from "wagmi";
+import TradeRow from "components/common/trades-row/tradeRow";
+import { numberWithCommas, truncate } from "utils/HelperUtils";
 import { curveConfig, tokenConfig } from "../../constants/data";
+import { useWriteContract, useClient, useBlock, useAccount } from "wagmi";
+import FailedToasts from "../../components/modals/failed-toast/FailedToast";
+import SuccessToast from "../../components/modals/success-toast/successToast";
 import {
   getBalance,
   multicall,
   readContract,
   waitForTransactionReceipt,
 } from "viem/actions";
-import SuccessToast from "../../components/modals/success-toast/successToast";
-import FailedToasts from "../../components/modals/failed-toast/FailedToast";
-import { useTrades } from "hooks/useTrades";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface TokenPool {
   token: Address;
@@ -50,7 +60,7 @@ const TokenPage = () => {
   const { trades, refresh: refreshTrades } = useTrades(
     tokenId ? tokenId : "",
     "timestamp",
-    10
+    10,
   );
   const [disableBtn, setDisableBtn] = useState(true);
   const [btnLoading, setBtnLoading] = useState(false);
@@ -83,9 +93,9 @@ const TokenPage = () => {
     };
     setTokenPool(pool);
     const curveProgress =
-    // @ts-ignore
+      // @ts-ignore
       (formatEther(tokenPoolResult![3]) / formatEther(threshHold!)) * 100;
-    setBondingPercentage(parseFloat(curveProgress.toString()).toFixed(4));
+    setBondingPercentage(parseFloat(curveProgress.toString()).toFixed(2));
   };
 
   const fetchBalances = async () => {
@@ -180,7 +190,7 @@ const TokenPage = () => {
         onError: (e) => {
           handleError(e.message);
         },
-      }
+      },
     );
   };
 
@@ -220,7 +230,7 @@ const TokenPage = () => {
           onError: (error) => {
             handleError(error.message);
           },
-        }
+        },
       );
     }
   };
@@ -253,7 +263,7 @@ const TokenPage = () => {
           onError: (error) => {
             handleError(error.message);
           },
-        }
+        },
       );
     }
   };
@@ -328,12 +338,42 @@ const TokenPage = () => {
           setCopied(false);
         }, 3000);
       } catch (err) {
+        toast.error("Unable to copy content to clipboard");
         console.error("Failed to copy content: ", err);
         setCopied(false);
       }
     } else {
-      alert("No token address found");
+      toast.error("No token address found");
     }
+  };
+
+  const formatDate = (timestamp: number) => {
+    const date = new Date(timestamp * 1000);
+    const day = date.getDate();
+    const month = date.toLocaleString("default", { month: "short" });
+    const hour = date.getHours().toString().padStart(2, "0");
+    return `${day} ${month} ${hour}:00`;
+  };
+
+  const data = token?.prices.items.map((item) => ({
+    time: formatDate(item.id),
+    price: item.close,
+  }));
+
+  const formatYAxis = (value: string) => {
+    const ethValue = parseFloat(formatEther(BigInt(value)));
+    if (ethValue === 0) return "Ξ0";
+
+    if (ethValue < 1e-6) {
+      const scientificStr = ethValue.toExponential(6);
+      const [mantissa, exponent] = scientificStr.split("e");
+      const absExponent = Math.abs(parseInt(exponent));
+      return `Ξ0.${"0".repeat(absExponent - 1)}${mantissa.replace(".", "")}`;
+    }
+
+    if (ethValue >= 1) return `Ξ${ethValue.toFixed(2)}`;
+    if (ethValue >= 0.01) return `Ξ${ethValue.toFixed(4)}`;
+    return `Ξ${ethValue.toFixed(6)}`;
   };
 
   return (
@@ -355,11 +395,12 @@ const TokenPage = () => {
               />
               <div className="text-wrapper">
                 <h2>
-                  {token.name} (ticker: {token.symbol})
+                  {token.name} (${token.symbol})
                 </h2>
                 <p>
-                  {token.description}. {token.name} has a market size of{" "}
-                  {formatEther(BigInt(token.marketCap))} ETH
+                  {token.description}. <br />
+                  {token.name} has a market size of{" "}
+                  {formatEther(BigInt(token.marketCap))}Ξ
                 </p>
                 <div className="creator-details">
                   <div className="creator-name">
@@ -389,11 +430,12 @@ const TokenPage = () => {
             {token.isMigrated ? (
               <div className=" migrated-wrapper">
                 <div className="migrated-text">
-                  <h2>
-                    Token has been Migrated
-                  </h2>
+                  <h2>Token has been migrated</h2>
 
-                  <a href={`https://app.frax.finance/swap/main?from=${token.address}&to=native`} target="blank">
+                  <a
+                    href={`https://app.frax.finance/swap/main?from=${token.address}&to=native`}
+                    target="blank"
+                  >
                     Trade on FraxSwap
                   </a>
                 </div>
@@ -456,7 +498,7 @@ const TokenPage = () => {
                             You recieve{" "}
                             <span>
                               {numberWithCommas(
-                                parseFloat(tokenAmountOut).toFixed(2)
+                                parseFloat(tokenAmountOut).toFixed(2),
                               )}{" "}
                               {token.symbol}
                             </span>
@@ -468,7 +510,7 @@ const TokenPage = () => {
                     <div className="to-token">
                       <div>
                         <button className="from-token-btn">
-                          <img src={token.logoUrl} height="20" width="20" style={{ borderRadius: "50%" }} alt="" />
+                          <img src="./assets/images/3 2.png" alt="" />
                           <p>{token.symbol}</p>
                         </button>
                       </div>
@@ -487,7 +529,7 @@ const TokenPage = () => {
                             <img src="./assets/images/wallet.png " alt="" />
                             <span>
                               {numberWithCommas(
-                                parseFloat(tokenBalance).toFixed(2)
+                                parseFloat(tokenBalance).toFixed(2),
                               )}
                             </span>
                           </p>{" "}
@@ -563,11 +605,62 @@ const TokenPage = () => {
               </div>
             )}
           </section>
-          {/* <section className="section2">
-            <h1>Candlestick Chart</h1>
-            <CandlestickChart />
-            <CandleStick data={data} /> 
-          </section> */}
+
+          <section className="section2">
+            <ResponsiveContainer width="100%">
+              <LineChart
+                data={data}
+                margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis
+                  dataKey="time"
+                  stroke="#9CA3AF"
+                  minTickGap={2}
+                  tickLine={false}
+                  tick={{ fill: "#9CA3AF", fontSize: 10 }}
+                  // angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval="preserveStartEnd"
+                  label={{
+                    value: "random randome text",
+                    position: "insideBottomRight",
+                    offset: -20,
+                  }}
+                />
+                <YAxis
+                  stroke="#9CA3AF"
+                  tick={{ fill: "#9CA3AF", fontSize: 9 }} // Reduced font size here
+                  tickFormatter={(value) => formatYAxis(value.toString())}
+                  width={120} // Increased width to accommodate longer numbers
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#1F2937",
+                    border: "none",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  }}
+                  itemStyle={{ color: "#E5E7EB" }}
+                  formatter={(value) => [
+                    formatYAxis(value.toString()),
+                    "Price",
+                  ]}
+                  labelStyle={{ color: "#9CA3AF" }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="price"
+                  name="Price"
+                  stroke="#3B82F6"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 8, fill: "#3B82F6" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </section>
           <section className="section3">
             <div className="section3-header">
               <h2>Trades</h2>{" "}

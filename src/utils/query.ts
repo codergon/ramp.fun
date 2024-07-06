@@ -1,4 +1,4 @@
-import { gql } from 'graphql-request';
+import { gql } from "graphql-request";
 
 export const GET_TOKENS = gql`
   query MyQuery($orderBy: String, $chainId: Int) {
@@ -26,37 +26,50 @@ export const GET_TOKENS = gql`
 
 export const GET_TOKEN = gql`
   query MyQuery($id: String!) {
-  token(id: $id) {
-    address
-    creator
-    description
-    id
-    isMigrated
-    logoUrl
-    lpAddress
-    marketCap
-    name
-    symbol
-  }
-}
-`
-
-export const GET_TRADES = gql`query MyQuery($tokenId: String) {
-  trades(
-    orderBy: "timestamp"
-    orderDirection: "desc"
-    where: {tokenId: $tokenId}
-    limit: 5
-  ) {
-    items {
-      action
-      actor
-      tokenId
+    token(id: $id) {
+      address
+      creator
+      description
       id
-      timestamp
-      fee
-      amountOut
-      amountIn
+      prices {
+        items {
+          id
+          low
+          open
+          high
+          count
+          close
+          average
+        }
+      }
+      isMigrated
+      logoUrl
+      lpAddress
+      marketCap
+      name
+      symbol
     }
   }
-}`
+`;
+
+export const GET_TRADES = gql`
+  query MyQuery($tokenId: String) {
+    trades(
+      orderBy: "timestamp"
+      orderDirection: "desc"
+      where: { tokenId: $tokenId }
+      limit: 5
+    ) {
+      items {
+        action
+        actor
+        tokenId
+        id
+        timestamp
+        fee
+        amountOut
+        amountIn
+      }
+    }
+  }
+`;

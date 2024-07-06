@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { client } from '../utils/graphql';
-import { GET_TOKENS, GET_TOKEN } from '../utils/query';
-import { Address } from 'viem';
+import { useState, useEffect } from "react";
+import { client } from "../utils/graphql";
+import { GET_TOKENS, GET_TOKEN } from "../utils/query";
+import { Address } from "viem";
 
 interface Token {
   id: string;
@@ -23,12 +23,26 @@ interface TokensData {
 }
 
 interface TokenDetail extends Token {
-    isMigrated: boolean;
-    lpAddress: String | null;
+  isMigrated: boolean;
+  lpAddress: String | null;
+}
+
+interface TokenWithPrices extends TokenDetail {
+  prices: {
+    items: {
+      id: number;
+      open: string;
+      high: string;
+      low: string;
+      close: string;
+      average: string;
+      count: string;
+    }[];
+  };
 }
 
 interface TokenData {
-    token: TokenDetail
+  token: TokenWithPrices;
 }
 
 export const useTokens = (chainId: number, orderBy: string, limit: number) => {
@@ -40,11 +54,14 @@ export const useTokens = (chainId: number, orderBy: string, limit: number) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await client.request<TokensData>(GET_TOKENS, { orderBy, chainId });
+      const data = await client.request<TokensData>(GET_TOKENS, {
+        orderBy,
+        chainId,
+      });
       setTokens(data.tokens.items);
     } catch (err) {
-        console.log(err);
-      setError('An Error occured while fetching tokens...');
+      console.log(err);
+      setError("An Error occured while fetching tokens...");
     } finally {
       setLoading(false);
     }
@@ -59,35 +76,35 @@ export const useTokens = (chainId: number, orderBy: string, limit: number) => {
 };
 
 export const useToken = (id: string) => {
-    const [token, setToken] = useState<TokenDetail>();
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-  
-    const fetchToken = async (id: string) => {
-      setLoading(true);
-      setError(null);
-      if (id == "") {
-        setLoading(false);
-        return
-    }
-      try {
-        const data = await client.request<TokenData>(GET_TOKEN, { id });
-        setToken(data.token);
-      } catch (err) {
-          console.log(err);
-        setError('An Error occured while fetching tokens...');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [token, setToken] = useState<TokenWithPrices>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-    const refetch = async () => {
-      await fetchToken(id);
+  const fetchToken = async (id: string) => {
+    setLoading(true);
+    setError(null);
+    if (id == "") {
+      setLoading(false);
+      return;
     }
-  
-    useEffect(() => {
-      fetchToken(id);
-    }, []);
-  
-    return { token, loading, error, refetch };
+    try {
+      const data = await client.request<TokenData>(GET_TOKEN, { id });
+      setToken(data.token);
+    } catch (err) {
+      console.log(err);
+      setError("An Error occured while fetching tokens...");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const refetch = async () => {
+    await fetchToken(id);
+  };
+
+  useEffect(() => {
+    fetchToken(id);
+  }, []);
+
+  return { token, loading, error, refetch };
+};
