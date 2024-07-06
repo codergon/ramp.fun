@@ -3,9 +3,19 @@ import { useWindowSize } from "react-use";
 import { truncate } from "utils/HelperUtils";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WalletIcon from "components/common/wallet-icon";
-import { useAccount, useEnsAvatar, useEnsName, useSwitchChain, useDisconnect, useChainId } from "wagmi";
+import {
+  useAccount,
+  useEnsAvatar,
+  useEnsName,
+  useSwitchChain,
+  useDisconnect,
+  useChainId,
+} from "wagmi";
 import { ArrowUpRight, Eye, WaveSine } from "@phosphor-icons/react";
 import { useState } from "react";
+import { useTopbarTrades, useTrades } from "hooks/useTrades";
+import { formatEther } from "viem";
+import makeBlockie from "ethereum-blockies-base64";
 
 const Topbar = () => {
   const { open } = useWeb3Modal();
@@ -19,30 +29,39 @@ const Topbar = () => {
     query: { enabled: !!ens },
   });
 
-  const { width } = useWindowSize();
-  const { chains, switchChain } = useSwitchChain();
-  const { disconnect } = useDisconnect();
-  const [showNetworkDrop, setShowNetworkDrop] = useState(false);
   const currentChain = useChainId();
+  const { width } = useWindowSize();
+  const { disconnect } = useDisconnect();
+  const { chains, switchChain } = useSwitchChain();
+  const { trades } = useTopbarTrades(100, currentChain);
+  const [showNetworkDrop, setShowNetworkDrop] = useState(false);
 
   return (
     <>
       <div className="trending">
         <div className="trending-projects">
           <div className="trending-projects--inner">
-            {Array(14)
-              .fill(0)
-              .map((project, index) => {
-                return (
-                  <div key={index} className="project">
-                    <img
-                      src={`./assets/images/${((index + 1) % 4) + 1}.jpg`}
-                      alt=""
-                    />
-                    <p>0xfe3...4fc bought 10 RAMP</p>
-                  </div>
-                );
-              })}
+            {trades.map((trade, index) => {
+              return (
+                <div key={`${trade.timestamp}:${index}`} className="project">
+                  <img src={makeBlockie(trade.actor)} />
+                  <p>
+                    {truncate(trade.actor)}
+                    {trade.action === "BUY" ? " bought " : " sold "}
+                    {parseFloat(
+                      formatEther(
+                        BigInt(
+                          trade.action === "BUY"
+                            ? trade.amountOut
+                            : trade.amountIn,
+                        ),
+                      ),
+                    ).toFixed(8)}{" "}
+                    ${trade.token.symbol}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -74,22 +93,22 @@ const Topbar = () => {
               {showNetworkDrop && (
                 <div className="dropdown-wrapper">
                   <div className="dropdown-container">
-                    {
-                      chains.map((chain) => (
-                        <button
-                          key={chain.id}
-                          disabled={currentChain == chain.id ? true : false}
-                          onClick={() => {
-                            switchChain({ chainId: chain.id as 252 | 2522 })
-                            setShowNetworkDrop(false);
-                          }}
-                          className="border-bottom"
-                          style={currentChain == chain.id ? {background: "#333"} : {}}
-                        >
-                          {chain.name}
-                        </button>
-                      ))
-                    }
+                    {chains.map((chain) => (
+                      <button
+                        key={chain.id}
+                        disabled={currentChain == chain.id ? true : false}
+                        onClick={() => {
+                          switchChain({ chainId: chain.id as 252 | 2522 });
+                          setShowNetworkDrop(false);
+                        }}
+                        className="border-bottom"
+                        style={
+                          currentChain == chain.id ? { background: "#333" } : {}
+                        }
+                      >
+                        {chain.name}
+                      </button>
+                    ))}
                     <button
                       onClick={() => {
                         disconnect();
@@ -123,12 +142,12 @@ const Topbar = () => {
             <>
               <div className="divider" />
 
-              <a target="_blank" href="">
+              <a target="_blank" href="https://x.com">
                 <p>TW</p>
                 <ArrowUpRight size={14} weight="bold" />
               </a>
 
-              <a target="_blank" href="">
+              <a target="_blank" href="https://github.com/codergon/ramp.fun">
                 <p>GH</p>
                 <ArrowUpRight size={14} weight="bold" />
               </a>

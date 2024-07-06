@@ -28,6 +28,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { ArrowLeft, ArrowRight, Wallet } from "@phosphor-icons/react";
 
 interface TokenPool {
   token: Address;
@@ -490,7 +491,7 @@ const TokenPage = () => {
                               }
                             />{" "}
                             <p className="wallet-bal-wrapper">
-                              <img src="./assets/images/wallet.png " alt="" />
+                              <Wallet />
                               <span>{parseFloat(ethBalance).toFixed(4)}</span>
                             </p>
                           </div>
@@ -526,7 +527,7 @@ const TokenPage = () => {
                             }
                           />{" "}
                           <p className="wallet-bal-wrapper">
-                            <img src="./assets/images/wallet.png " alt="" />
+                            <Wallet />
                             <span>
                               {numberWithCommas(
                                 parseFloat(tokenBalance).toFixed(2),
@@ -665,17 +666,15 @@ const TokenPage = () => {
             <div className="section3-header">
               <h2>Trades</h2>{" "}
               <div>
-                <img
-                  className="prev-btn"
-                  src="./assets/images/next.png"
-                  alt=""
-                />{" "}
-                <p>1</p>{" "}
-                <img
-                  className="next-btn"
-                  src="./assets/images/next.png"
-                  alt=""
-                />{" "}
+                <button>
+                  <ArrowLeft size={20} />
+                </button>
+
+                <p>1</p>
+
+                <button>
+                  <ArrowRight size={20} />
+                </button>
               </div>
             </div>
             <div className="trades-table-wrapper">

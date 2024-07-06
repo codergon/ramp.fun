@@ -1,176 +1,193 @@
 // TRENDING
 .trending {
-  @include flex(row, flex-start, center, 0px);
-  top: 0;
-  left: 0;
-  flex: none;
-  width: 100%;
-  overflow: hidden;
-  position: fixed;
-  z-index: 99 * 999;
-  height: $trendbar-h;
-  background: $secondary;
-
-  .trending-projects {
-    @include flex(row, flex-start, flex-start, 24px);
+    @include flex(row, flex-start, center, 0px);
+    top: 0;
+    left: 0;
+    flex: none;
     width: 100%;
     overflow: hidden;
+    position: fixed;
+    z-index: 99 * 999;
+    height: $trendbar-h;
+    background: $secondary;
 
-    &--inner {
-      @include flex(row, flex-start, flex-start, 20px);
-
-      .project {
-        @include flex(row, flex-start, center, 5px);
-        flex: none;
-        color: $black;
-        font-size: 14px;
-        font-weight: 500;
-        overflow: hidden;
-        padding: 0px 5px;
-        text-transform: uppercase;
-
-        img {
-          width: 20px;
-          height: 20px;
-          object-fit: cover;
-          border-radius: 50%;
-        }
-      }
+    /* Pause animation on hover */
+    .trending-projects:hover .trending-projects--inner {
+        animation-play-state: paused;
     }
-  }
+
+    .trending-projects {
+        @include flex(row, flex-start, flex-start, 24px);
+        width: 100%;
+        overflow: hidden;
+
+        &--inner {
+            @include flex(row, flex-start, flex-start, 20px);
+
+            animation: scroll 120s linear infinite;
+            white-space: nowrap;
+
+            .project {
+                @include flex(row, flex-start, center, 5px);
+                flex: none;
+                color: $black;
+                font-size: 14px;
+                font-weight: 500;
+                overflow: hidden;
+                padding: 0px 5px;
+                text-transform: uppercase;
+
+                img {
+                    width: 20px;
+                    height: 20px;
+                    object-fit: cover;
+                    border-radius: 50%;
+                }
+            }
+        }
+    }
 }
 
 // TOPBAR
 .c-topbar {
-  @include flex(row, space-between, center);
-  flex: none;
-  width: 100%;
-  font-size: 14px;
-  // overflow: hidden;
-  height: $topbar-h;
-  padding: 0px $padHor;
-  margin-top: $trendbar-h;
-  border-bottom: $border-1;
+    @include flex(row, space-between, center);
+    flex: none;
+    width: 100%;
+    font-size: 14px;
+    // overflow: hidden;
+    height: $topbar-h;
+    padding: 0px $padHor;
+    margin-top: $trendbar-h;
+    border-bottom: $border-1;
 
-  .time-display {
-    font-size: 15px;
-    line-height: 1;
+    .time-display {
+        font-size: 15px;
+        line-height: 1;
 
-    background: linear-gradient(10deg, pink, orange, pink, violet, red);
-    background-clip: text;
-    color: transparent;
-  }
-
-  &__logo {
-    @include flex(row, flex-start, center, 2px);
-    font-size: 24px;
-    font-weight: 500;
-    letter-spacing: 1px;
-
-    .icon {
-      @include flex(row, center, center, 0px);
-      margin-bottom: -5px;
-      transform: rotateZ(23deg);
-      svg path {
-        stroke: $white;
-        stroke-width: 3px;
-      }
+        background: linear-gradient(10deg, pink, orange, pink, violet, red);
+        background-clip: text;
+        color: transparent;
     }
-  }
 
-  &__connect {
-    @include flex(row);
-  }
+    &__logo {
+        @include flex(row, flex-start, center, 2px);
+        font-size: 24px;
+        font-weight: 500;
+        letter-spacing: 1px;
 
-  &__block {
-    @include flex(row, flex-start, center, 20px);
-    font-size: 15px;
-    .frax-network {
-      position: relative;
-      background-color: #1c1c1c;
-      padding: 7px;
-      border-radius: 999px;
-      .logo {
-        display: grid;
-        place-items: center;
-        background-color: white;
-
-        border-radius: 999px;
-        img {
-          max-width: 30px;
-          width: 100%;
+        .icon {
+            @include flex(row, center, center, 0px);
+            margin-bottom: -5px;
+            transform: rotateZ(23deg);
+            svg path {
+                stroke: $white;
+                stroke-width: 3px;
+            }
         }
-      }
+    }
 
-      .dropdown-wrapper {
-        position: absolute;
-        bottom: -150px;
-        left: 50%;
-        color: white;
+    &__connect {
+        @include flex(row);
+    }
+
+    &__block {
+        @include flex(row, flex-start, center, 20px);
+        font-size: 15px;
+        .frax-network {
+            position: relative;
+            background-color: #1c1c1c;
+            padding: 7px;
+            border-radius: 999px;
+            .logo {
+                display: grid;
+                place-items: center;
+                background-color: white;
+
+                border-radius: 999px;
+                img {
+                    max-width: 30px;
+                    width: 100%;
+                }
+            }
+
+            .dropdown-wrapper {
+                position: absolute;
+                bottom: -150px;
+                left: 50%;
+                color: white;
+                transform: translateX(-50%);
+                background-color: transparent;
+                padding-top: 0px;
+
+                .dropdown-container {
+                    background-color: #1b1b1b;
+                    border-radius: 15px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 10px 10px;
+                    border: 1px solid #e4cce11a;
+                    .border-bottom {
+                        border-bottom: 1px solid #e4cce11a;
+                    }
+                    button {
+                        width: max-content;
+                        text-align: center;
+                        padding: 10px 27px;
+                    }
+                }
+            }
+        }
+        .divider {
+            width: 2px;
+            height: 20px;
+            background: $neutral-300;
+        }
+
+        a {
+            @include flex(row, flex-start, center, 2px);
+            font-size: 14px;
+            border-bottom: 1px solid $white;
+            p {
+                line-height: 1;
+            }
+        }
+
+        .acct-display {
+            @include flex(row, flex-start, center, 8px);
+            cursor: pointer;
+            p {
+                line-height: 1;
+            }
+            img {
+                width: 22px;
+                height: 22px;
+                object-fit: cover;
+                border-radius: 100%;
+                border: 1px solid $neutral-300;
+            }
+        }
+
+        .c-topbar__btn {
+            @include flex(row);
+            gap: 6px;
+            cursor: pointer;
+            padding: 7px 10px;
+            border-radius: 6px;
+
+            &:hover {
+                background: $neutral-100;
+            }
+        }
+    }
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
         transform: translateX(-50%);
-        background-color: transparent;
-        padding-top: 0px;
-
-        .dropdown-container {
-          background-color: #1b1b1b;
-          border-radius: 15px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 8px;
-          padding: 10px 10px;
-          border: 1px solid #e4cce11a;
-          .border-bottom {
-            border-bottom: 1px solid #e4cce11a;
-          }
-          button {
-            width: max-content;
-            text-align: center;
-            padding: 10px 27px;
-          }
-        }
-      }
     }
-    .divider {
-      width: 2px;
-      height: 20px;
-      background: $neutral-300;
-    }
-
-    a {
-      @include flex(row, flex-start, center, 2px);
-      font-size: 14px;
-      border-bottom: 1px solid $white;
-      p {
-        line-height: 1;
-      }
-    }
-
-    .acct-display {
-      @include flex(row, flex-start, center, 8px);
-      cursor: pointer;
-      p {
-        line-height: 1;
-      }
-      img {
-        width: 22px;
-        height: 22px;
-        object-fit: cover;
-        border-radius: 100%;
-        border: 1px solid $neutral-300;
-      }
-    }
-
-    .c-topbar__btn {
-      @include flex(row);
-      gap: 6px;
-      cursor: pointer;
-      padding: 7px 10px;
-      border-radius: 6px;
-
-      &:hover {
-        background: $neutral-100;
-      }
-    }
-  }
 }

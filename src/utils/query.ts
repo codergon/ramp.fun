@@ -73,3 +73,29 @@ export const GET_TRADES = gql`
     }
   }
 `;
+
+export const GET_TOPBAR_TRADES = gql`
+  query GetTrades($limit: Int!, $chainId: Int!) {
+    trades(
+      orderBy: "timestamp"
+      orderDirection: "desc"
+      limit: $limit
+      where: { chainId: $chainId }
+    ) {
+      items {
+        action
+        actor
+        token {
+          address
+          symbol
+        }
+        id
+        timestamp
+        fee
+        amountOut
+        amountIn
+        chainId
+      }
+    }
+  }
+`;
