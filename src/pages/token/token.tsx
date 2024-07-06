@@ -13,7 +13,6 @@ import { curveConfig, tokenConfig } from "../../constants/data";
 import { useWriteContract, useClient, useBlock, useAccount } from "wagmi";
 import {
   getBalance,
-  multicall,
   readContract,
   waitForTransactionReceipt,
 } from "viem/actions";
@@ -29,12 +28,6 @@ import {
 import { ArrowLeft, ArrowRight, Wallet } from "@phosphor-icons/react";
 import { usePoolAndMigrationThreshold } from "hooks/usePoolAndMigrationThreshold";
 import { useConfig } from "wagmi";
-
-interface TokenPool {
-  token: Address;
-  lastPrice: bigint;
-  migrated: boolean;
-}
 
 const TokenPage = () => {
   const { tokenId } = useParams();
@@ -102,7 +95,7 @@ const TokenPage = () => {
 
   const handleError = (error: any) => {
     console.log(error);
-    toast.error("An error occured while placing your trade");
+    toast.error("An error occured while placing your trade.");
     setDisableBtn(false);
     setBtnLoading(false);
   };
@@ -115,9 +108,12 @@ const TokenPage = () => {
       });
       await refetchToken();
       await refreshTrades();
-      toast.success("Trade placed successfully", {
-        description: `${client.chain.blockExplorers.default.url}/tx/${hash}`,
-      });
+      toast.success(
+        <div>
+          <p>Trade placed successfully</p>
+          <a href={`${client.chain.blockExplorers.default.url}/tx/${hash}`} target="_blank">{truncate(`${hash}`)}</a>
+        </div>
+      )
     } catch (e) {
       // @ts-ignore
       handleError(e.message);
