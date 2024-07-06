@@ -102,9 +102,7 @@ const TokenPage = () => {
 
   const handleError = (error: any) => {
     console.log(error);
-    toast.error("An error occured while placing your trade", {
-      description: error,
-    });
+    toast.error("An error occured while placing your trade");
     setDisableBtn(false);
     setBtnLoading(false);
   };
@@ -329,18 +327,18 @@ const TokenPage = () => {
 
   const formatYAxis = (value: string) => {
     const ethValue = parseFloat(formatEther(BigInt(value)));
-    if (ethValue === 0) return "Ξ0";
+    if (ethValue === 0) return "0 ETH";
 
     if (ethValue < 1e-6) {
       const scientificStr = ethValue.toExponential(6);
       const [mantissa, exponent] = scientificStr.split("e");
       const absExponent = Math.abs(parseInt(exponent));
-      return `Ξ0.${"0".repeat(absExponent - 1)}${mantissa.replace(".", "")}`;
+      return `0.${"0".repeat(absExponent - 1)}${mantissa.replace(".", "")} ETH`;
     }
 
-    if (ethValue >= 1) return `Ξ${ethValue.toFixed(2)}`;
-    if (ethValue >= 0.01) return `Ξ${ethValue.toFixed(4)}`;
-    return `Ξ${ethValue.toFixed(6)}`;
+    if (ethValue >= 1) return `${ethValue.toFixed(2)} ETH`;
+    if (ethValue >= 0.01) return `${ethValue.toFixed(4)} ETH`;
+    return `${ethValue.toFixed(6)} ETH`;
   };
 
   return (
@@ -367,7 +365,7 @@ const TokenPage = () => {
                 <p>
                   {token?.description}. <br />
                   {token?.name} has a market size of{" "}
-                  {formatEther(BigInt(token?.marketCap))}Ξ
+                  {formatEther(BigInt(token?.marketCap))} ETH
                 </p>
                 <div className="creator-details">
                   <div className="creator-name">
@@ -457,7 +455,7 @@ const TokenPage = () => {
                             />{" "}
                             <p className="wallet-bal-wrapper">
                               <Wallet />
-                              <span>{parseFloat(ethBalance).toFixed(4)}Ξ</span>
+                              <span>{parseFloat(ethBalance).toFixed(4)}</span>
                             </p>
                           </div>
                           <p className="recieve-amount">
@@ -501,12 +499,12 @@ const TokenPage = () => {
                                 parseFloat(tokenBalance).toFixed(2),
                               )}
                               &nbsp;
-                              {token?.symbol}
+                              {/* {token?.symbol} */}
                             </span>
                           </p>{" "}
                         </div>
                         <p className="recieve-amount">
-                          You recieve <span>{ethAmountOut}Ξ </span>
+                          You recieve <span>{ethAmountOut} ETH</span>
                         </p>
                       </div>
                     </div>

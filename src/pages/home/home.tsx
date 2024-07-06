@@ -82,8 +82,7 @@ const Home = () => {
                             <div className="value market-cap">
                               {parseFloat(
                                 formatEther(BigInt(token.marketCap)),
-                              ).toFixed(5)}
-                              Ξ
+                              ).toFixed(5)} ETH
                             </div>
                           </div>
                           •
