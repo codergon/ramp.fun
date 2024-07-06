@@ -79,6 +79,7 @@ const CreateToken = () => {
         description: `${client.chain.blockExplorers.default.url}/tx/${hash}`,
       });
     } catch (e) {
+      // @ts-ignore
       handleError(e?.details ? JSON.parse(e?.details)?.message : e.name);
     } finally {
       setLoading(false);
@@ -126,6 +127,7 @@ const CreateToken = () => {
         },
         onError: (error: unknown) => {
           handleError(
+            // @ts-ignore
             error?.details ? JSON.parse(error?.details)?.message : error.name,
           );
         },
