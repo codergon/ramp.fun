@@ -80,7 +80,7 @@ const CreateToken = () => {
       });
     } catch (e) {
       // @ts-ignore
-      handleError(e?.details ? JSON.parse(e?.details)?.message : e.name);
+      handleError(e.message);
     } finally {
       setLoading(false);
       setName("");
@@ -107,7 +107,6 @@ const CreateToken = () => {
       {
         ...curveConfig,
         functionName: "launchToken",
-        // @ts-ignore
         value: creationFee.data ? creationFee.data : BigInt(0),
         args: [
           {
@@ -125,11 +124,8 @@ const CreateToken = () => {
         onSuccess: async (hash: Address) => {
           await handleSuccess(hash);
         },
-        onError: (error: unknown) => {
-          handleError(
-            // @ts-ignore
-            error?.details ? JSON.parse(error?.details)?.message : error.name,
-          );
+        onError: (error) => {
+          handleError(error.message);
         },
       },
     );

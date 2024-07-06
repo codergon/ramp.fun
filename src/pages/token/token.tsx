@@ -122,7 +122,7 @@ const TokenPage = () => {
       });
     } catch (e) {
       // @ts-ignore
-      handleError(e?.details ? JSON.parse(e?.details)?.message : e.name);
+      handleError(e.message);
     } finally {
       setDisableBtn(false);
       setBtnLoading(false);
@@ -195,10 +195,7 @@ const TokenPage = () => {
             await handleSuccess(data);
           },
           onError: (error) => {
-            handleError(
-              // @ts-ignore
-              error?.details ? JSON.parse(error?.details)?.message : error.name,
-            );
+            handleError(error.message);
           },
         },
       );
@@ -231,10 +228,7 @@ const TokenPage = () => {
             await handleApprovalSuccess(hash);
           },
           onError: (error) => {
-            handleError(
-              // @ts-ignore
-              error?.details ? JSON.parse(error?.details)?.message : error.name,
-            );
+            handleError(error.message);
           },
         },
       );
