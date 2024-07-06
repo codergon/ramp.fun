@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { client } from "../utils/graphql";
-import { GET_TOKENS, GET_TOKEN } from "../utils/query";
 import { Address } from "viem";
+import { client } from "../utils/graphql";
+import { useQuery } from "@tanstack/react-query";
+import { GET_TOKENS, GET_TOKEN } from "../utils/query";
 
 interface Token {
   id: string;
@@ -46,65 +46,37 @@ interface TokenData {
 }
 
 export const useTokens = (chainId: number, orderBy: string, limit: number) => {
-  const [tokens, setTokens] = useState<Token[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchTokens = async (chainId: number, orderBy: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await client.request<TokensData>(GET_TOKENS, {
-        orderBy,
-        chainId,
-      });
-      setTokens(data.tokens.items);
-    } catch (err) {
-      console.log(err);
-      setError("An Error occured while fetching tokens...");
-    } finally {
-      setLoading(false);
-    }
+  const fetchTokens = async (
+    chainId: number,
+    orderBy: string,
+    limit: number,
+  ) => {
+    const { tokens } = await client.request<TokensData>(GET_TOKENS, {
+      orderBy,
+      chainId,
+      limit,
+    });
+    return tokens.items;
   };
 
-  useEffect(() => {
-    setTokens([]);
-    fetchTokens(chainId, orderBy);
-  }, [chainId, orderBy, limit]);
-
-  return { tokens: tokens, loading, error };
+  return useQuery<Token[], Error>({
+    queryKey: ["tokens", chainId, orderBy, limit],
+    queryFn: () => fetchTokens(chainId, orderBy, limit),
+  });
 };
 
 export const useToken = (id: string) => {
-  const [token, setToken] = useState<TokenWithPrices>();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchToken = async (id: string) => {
-    setLoading(true);
-    setError(null);
-    if (id == "") {
-      setLoading(false);
-      return;
+  const fetchToken = async (id: string): Promise<TokenWithPrices | null> => {
+    if (id === "") {
+      return null;
     }
-    try {
-      const data = await client.request<TokenData>(GET_TOKEN, { id });
-      setToken(data.token);
-    } catch (err) {
-      console.log(err);
-      setError("An Error occured while fetching tokens...");
-    } finally {
-      setLoading(false);
-    }
+    const { token } = await client.request<TokenData>(GET_TOKEN, { id });
+    return token;
   };
 
-  const refetch = async () => {
-    await fetchToken(id);
-  };
-
-  useEffect(() => {
-    fetchToken(id);
-  }, []);
-
-  return { token, loading, error, refetch };
+  return useQuery<TokenWithPrices | null, Error>({
+    queryKey: ["token", id],
+    queryFn: () => fetchToken(id),
+    enabled: id !== "", // Only run the query if id is not an empty string
+  });
 };

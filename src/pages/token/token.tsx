@@ -11,8 +11,6 @@ import TradeRow from "components/common/trades-row/tradeRow";
 import { numberWithCommas, truncate } from "utils/HelperUtils";
 import { curveConfig, tokenConfig } from "../../constants/data";
 import { useWriteContract, useClient, useBlock, useAccount } from "wagmi";
-import FailedToast from "../../components/modals/failed-toast/FailedToast";
-import SuccessToast from "../../components/modals/success-toast/successToast";
 import {
   getBalance,
   multicall,
@@ -29,6 +27,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { ArrowLeft, ArrowRight, Wallet } from "@phosphor-icons/react";
+import { usePoolAndMigrationThreshold } from "hooks/usePoolAndMigrationThreshold";
+import { useConfig } from "wagmi";
 
 interface TokenPool {
   token: Address;
@@ -40,8 +40,6 @@ const TokenPage = () => {
   const { tokenId } = useParams();
   const [buyActive, setBuyActive] = useState(true);
   const [sellActive, setSellActive] = useState(false);
-  const [tokenPool, setTokenPool] = useState<TokenPool>();
-  const [bondingPercentage, setBondingPercentage] = useState("0");
   const [ethAmountIn, setEthAmountIn] = useState("0");
   const [ethAmountOut, setEthAmountOut] = useState("0");
   const [tokenAmountIn, setTokenAmountIn] = useState("0");
@@ -49,55 +47,30 @@ const TokenPage = () => {
   const [ethBalance, setEthBalance] = useState("0");
   const [tokenBalance, setTokenBalance] = useState("0");
   const [slippage, setSlippage] = useState("2");
-  const [showFailModal, setShowFailModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [txnHash, setTxnHash] = useState("");
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const {
-    token,
-    loading: tokenLoading,
+    isLoading: isTokenLoading,
+    data: token,
     refetch: refetchToken,
+    error: tokenError,
   } = useToken(tokenId ? tokenId : "");
-  const { trades, refresh: refreshTrades } = useTrades(
+  const { data: trades, refetch: refreshTrades } = useTrades(
     tokenId ? tokenId : "",
     "timestamp",
     10,
   );
+  const client = useClient();
+  const config = useConfig();
+  const { refetch: refetchBlock } = useBlock();
+  const { address, isConnected } = useAccount();
+  const { writeContractAsync } = useWriteContract();
   const [disableBtn, setDisableBtn] = useState(true);
   const [btnLoading, setBtnLoading] = useState(false);
-
-  const client = useClient();
-  const { address, isConnected } = useAccount();
-  const { refetch: refetchBlock } = useBlock();
-  const { writeContractAsync } = useWriteContract();
-
-  const fetchPoolAndMigrationThreshold = async (addr: Address) => {
-    const [{ result: tokenPoolResult }, { result: threshHold }] =
-      // @ts-ignore
-      await multicall(client, {
-        contracts: [
-          {
-            ...curveConfig,
-            functionName: "tokenPool",
-            args: [addr],
-          },
-          {
-            ...curveConfig,
-            functionName: "migrationThreshold",
-          },
-        ],
-      });
-    const pool: TokenPool = {
-      token: tokenPoolResult![0],
-      lastPrice: tokenPoolResult![5],
-      migrated: tokenPoolResult![10],
-    };
-    setTokenPool(pool);
-    const curveProgress =
-      // @ts-ignore
-      (formatEther(tokenPoolResult![3]) / formatEther(threshHold!)) * 100;
-    setBondingPercentage(parseFloat(curveProgress.toString()).toFixed(2));
-  };
+  const {
+    data: pool,
+    isLoading: isPoolLoading,
+    error: poolError,
+  } = usePoolAndMigrationThreshold(token?.address as `0x${string}`, config);
 
   const fetchBalances = async () => {
     if (address && token) {
@@ -118,12 +91,6 @@ const TokenPage = () => {
   };
 
   useEffect(() => {
-    if (token) {
-      fetchPoolAndMigrationThreshold(token.address);
-    }
-  }, [token]);
-
-  useEffect(() => {
     if (address) {
       fetchBalances();
       setDisableBtn(false);
@@ -135,12 +102,11 @@ const TokenPage = () => {
 
   const handleError = (error: any) => {
     console.log(error);
-    setShowFailModal(true);
+    toast.error("An error occured while placing your trade", {
+      description: error,
+    });
     setDisableBtn(false);
     setBtnLoading(false);
-    setTimeout(() => {
-      setShowFailModal(false);
-    }, 3000);
   };
 
   const handleSuccess = async (hash: Address) => {
@@ -151,16 +117,15 @@ const TokenPage = () => {
       });
       await refetchToken();
       await refreshTrades();
-      setTxnHash(hash);
-      setShowSuccessModal(true);
-      setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 3000);
+      toast.success("Trade placed successfully", {
+        description: `${client.chain.blockExplorers.default.url}/tx/${hash}`,
+      });
     } catch (e) {
-      handleError(e);
+      handleError(e?.details ? JSON.parse(e?.details)?.message : e.name);
+    } finally {
+      setDisableBtn(false);
+      setBtnLoading(false);
     }
-    setDisableBtn(false);
-    setBtnLoading(false);
   };
 
   const handleApprovalSuccess = async (hash: Address) => {
@@ -229,7 +194,9 @@ const TokenPage = () => {
             await handleSuccess(data);
           },
           onError: (error) => {
-            handleError(error.message);
+            handleError(
+              error?.details ? JSON.parse(error?.details)?.message : error.name,
+            );
           },
         },
       );
@@ -262,7 +229,9 @@ const TokenPage = () => {
             await handleApprovalSuccess(hash);
           },
           onError: (error) => {
-            handleError(error.message);
+            handleError(
+              error?.details ? JSON.parse(error?.details)?.message : error.name,
+            );
           },
         },
       );
@@ -379,15 +348,15 @@ const TokenPage = () => {
 
   return (
     <div className="token-page">
-      {token && tokenPool ? (
+      {pool && token ? (
         <div className="token-page-wrapper">
           <section className="section1">
             <div className="section1-left">
               <img
                 className="tokenImg"
                 src={
-                  token.logoUrl.slice(0, 5) == "https"
-                    ? token.logoUrl
+                  token?.logoUrl.slice(0, 5) == "https"
+                    ? token?.logoUrl
                     : "./assets/images/tokenImg1.png"
                 }
                 height={"260px"}
@@ -396,12 +365,12 @@ const TokenPage = () => {
               />
               <div className="text-wrapper">
                 <h2>
-                  {token.name} (${token.symbol})
+                  {token?.name} (${token?.symbol})
                 </h2>
                 <p>
-                  {token.description}. <br />
-                  {token.name} has a market size of{" "}
-                  {formatEther(BigInt(token.marketCap))}Ξ
+                  {token?.description}. <br />
+                  {token?.name} has a market size of{" "}
+                  {formatEther(BigInt(token?.marketCap))}Ξ
                 </p>
                 <div className="creator-details">
                   <div className="creator-name">
@@ -409,11 +378,11 @@ const TokenPage = () => {
                     <p>
                       Created by{" "}
                       <a
-                        href={`${client.chain.blockExplorers.default.url}/address/${token.creator}`}
+                        href={`${client.chain.blockExplorers.default.url}/address/${token?.creator}`}
                         target="_blank"
                         className="schwarzy"
                       >
-                        {truncate(token.creator)}
+                        {truncate(token?.creator)}
                       </a>
                     </p>
                   </div>
@@ -422,19 +391,19 @@ const TokenPage = () => {
                     className="creator-address"
                   >
                     <img src="./assets/images/copy.png" alt="" />
-                    <p>{truncate(token.address)}</p>
+                    <p>{truncate(token?.address)}</p>
                     {copied && <p className="address-copied">Address copied</p>}
                   </div>
                 </div>
               </div>
             </div>
-            {token.isMigrated ? (
+            {token?.isMigrated ? (
               <div className=" migrated-wrapper">
                 <div className="migrated-text">
                   <h2>Token has been migrated</h2>
 
                   <a
-                    href={`https://app.frax.finance/swap/main?from=${token.address}&to=native`}
+                    href={`https://app.frax.finance/swap/main?from=${token?.address}&to=native`}
                     target="blank"
                   >
                     Trade on FraxSwap
@@ -500,7 +469,7 @@ const TokenPage = () => {
                               {numberWithCommas(
                                 parseFloat(tokenAmountOut).toFixed(2),
                               )}{" "}
-                              {token.symbol}
+                              {token?.symbol}
                             </span>
                           </p>
                         </div>
@@ -510,8 +479,11 @@ const TokenPage = () => {
                     <div className="to-token">
                       <div>
                         <button className="from-token-btn">
-                          <img src="./assets/images/3 2.png" alt="" />
-                          <p>{token.symbol}</p>
+                          <img
+                            src={token?.logoUrl}
+                            style={{ borderRadius: "5px", width: "20px" }}
+                          />
+                          <p>{token?.symbol}</p>
                         </button>
                       </div>
                       <div className="amount-container">
@@ -540,7 +512,6 @@ const TokenPage = () => {
                       </div>
                     </div>
                   )}
-
                 </div>
                 <div className="btn-wrapper">
                   <button
@@ -571,29 +542,12 @@ const TokenPage = () => {
                       <p>Place trade</p>
                     )}
                   </button>
-
-                  {showSuccessModal && (
-                    <div className="marginTop">
-                      <SuccessToast
-                        {...{
-                          message: "Trade sucessfully placed",
-                          hash: txnHash,
-                          url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`,
-                        }}
-                      />
-                    </div>
-                  )}
-                  {showFailModal && (
-                    <div className="marginTop">
-                      <FailedToast />
-                    </div>
-                  )}
                   <div className="bonding-curve-wrapper">
-                    <p>Bonding Curve Progress: {bondingPercentage}%</p>
+                    <p>Bonding Curve Progress: {pool?.bondingPercentage}%</p>
                     <div className="bonding-curve-loader">
                       <div
                         style={{
-                          width: `${bondingPercentage}%`,
+                          width: `${pool?.bondingPercentage}%`,
                         }}
                       ></div>
                     </div>
@@ -616,7 +570,6 @@ const TokenPage = () => {
                   minTickGap={2}
                   tickLine={false}
                   tick={{ fill: "#9CA3AF", fontSize: 10 }}
-                  // angle={-45}
                   textAnchor="end"
                   height={60}
                   interval="preserveStartEnd"
@@ -679,11 +632,11 @@ const TokenPage = () => {
                   <th className="border-radius1">Type</th>
                   <th>Account</th>
                   <th>ETH</th>
-                  <th>{token.symbol}</th>
+                  <th>{token?.symbol}</th>
                   <th>Fee</th>
                   <th className="border-radius2">Date</th>
                 </tr>
-                {trades.map((trade, index) => (
+                {trades?.map((trade, index) => (
                   <TradeRow
                     key={index}
                     trade={trade}
@@ -730,7 +683,8 @@ const TokenPage = () => {
         </div>
       ) : (
         <EmptyState
-          data={{ message: tokenLoading ? "Loading" : "Not found" }}
+          isLoading={isPoolLoading || isTokenLoading}
+          error={tokenError ? tokenError : poolError}
         />
       )}
     </div>

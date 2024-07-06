@@ -2,6 +2,7 @@ import { Address } from "viem";
 import { client } from "../utils/graphql";
 import { useState, useEffect } from "react";
 import { GET_TOPBAR_TRADES, GET_TRADES } from "../utils/query";
+import { useQuery } from "@tanstack/react-query";
 
 export interface Trade {
   id: string;
@@ -41,72 +42,43 @@ interface TopBarTradesData {
 }
 
 export const useTrades = (tokenId: string, orderBy: string, limit: number) => {
-  const [trades, setTrades] = useState<Trade[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchTrades = async (tokenId: String, orderBy: string) => {
-    setLoading(true);
-    setError(null);
-    if (tokenId == "") {
-      setLoading(false);
-      return;
+  const fetchTrades = async (
+    tokenId: string,
+    orderBy: string,
+    limit: number,
+  ) => {
+    if (tokenId === "") {
+      return [];
     }
-    try {
-      const data = await client.request<TradesData>(GET_TRADES, {
-        orderBy,
-        tokenId,
-      });
-      setTrades(data.trades.items);
-    } catch (err) {
-      console.log(err);
-      setError("An Error occured while fetching tokens...");
-    } finally {
-      setLoading(false);
-    }
+    const { trades } = await client.request<TradesData>(GET_TRADES, {
+      orderBy,
+      tokenId,
+      limit,
+    });
+    return trades.items;
   };
 
-  const refresh = async () => {
-    await fetchTrades(tokenId, orderBy);
-  };
-
-  useEffect(() => {
-    fetchTrades(tokenId, orderBy);
-  }, [tokenId, orderBy, limit]);
-
-  return { trades: trades, loading, error, refresh };
+  return useQuery<Trade[], Error>({
+    queryKey: ["trades", tokenId, orderBy, limit],
+    queryFn: () => fetchTrades(tokenId, orderBy, limit),
+    enabled: tokenId !== "",
+  });
 };
 
 export const useTopbarTrades = (limit: number, chainId: number) => {
-  const [trades, setTrades] = useState<TopBarTrade[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchTrades = async (limit: number, chainId: number) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const data = await client.request<TopBarTradesData>(GET_TOPBAR_TRADES, {
+  const fetchTopbarTrades = async (limit: number, chainId: number) => {
+    const { trades } = await client.request<TopBarTradesData>(
+      GET_TOPBAR_TRADES,
+      {
         limit,
         chainId,
-      });
-      setTrades(data.trades.items);
-    } catch (err) {
-      console.log(err);
-      setError("An Error occured while fetching tokens...");
-    } finally {
-      setLoading(false);
-    }
+      },
+    );
+    return trades.items;
   };
 
-  const refresh = async () => {
-    await fetchTrades(limit, chainId);
-  };
-
-  useEffect(() => {
-    fetchTrades(limit, chainId);
-  }, [limit, chainId]);
-
-  return { trades: trades, loading, error, refresh };
+  return useQuery<TopBarTrade[], Error>({
+    queryKey: ["topbarTrades", limit, chainId],
+    queryFn: () => fetchTopbarTrades(limit, chainId),
+  });
 };

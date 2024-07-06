@@ -14,7 +14,7 @@ import { formatEther } from "viem";
 
 const Home = () => {
   const { chainId } = useAccount();
-  const { tokens, loading, error } = useTokens(
+  const { error, isLoading, data } = useTokens(
     chainId ? chainId : fraxtalTestnet.id,
     "timestamp",
     10,
@@ -52,11 +52,11 @@ const Home = () => {
               </button>
             </div>
           </div>
-          {loading ? (
-            <EmptyState />
+          {isLoading ? (
+            <EmptyState isLoading={isLoading} error={error} />
           ) : (
             <div className="tokens-grid">
-              {tokens.map((token, index) => {
+              {data?.map((token, index) => {
                 return (
                   <NavLink key={index} className="token" to={`/${token.id}`}>
                     <div className="token-image">

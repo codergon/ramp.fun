@@ -1,17 +1,15 @@
 import "./create-token.scss";
 
-import { ClipLoader } from "react-spinners";
-import { useEffect, useRef, useState } from "react";
-import { Accordion, AccordionItem } from "@szhsin/react-accordion";
-import { CameraPlus, CaretDoubleRight, CaretUp } from "@phosphor-icons/react";
-import { useWriteContract, useReadContract, useClient } from "wagmi";
-import { curveConfig } from "../../constants/data";
-import SuccessToast from "components/modals/success-toast/successToast";
-import FailedToast from "components/modals/failed-toast/FailedToast";
-
 import Axios from "axios";
+import { toast } from "sonner";
 import { Address } from "viem";
+import { ClipLoader } from "react-spinners";
+import { curveConfig } from "../../constants/data";
+import { useEffect, useRef, useState } from "react";
 import { waitForTransactionReceipt } from "viem/actions";
+import { Accordion, AccordionItem } from "@szhsin/react-accordion";
+import { useWriteContract, useReadContract, useClient } from "wagmi";
+import { CameraPlus, CaretDoubleRight, CaretUp } from "@phosphor-icons/react";
 
 const CreateToken = () => {
   const [name, setName] = useState("");
@@ -23,16 +21,11 @@ const CreateToken = () => {
   const [website, setWebsite] = useState("");
   const [telegram, setTelegram] = useState("");
 
-  const [txnHash, setTxnHash] = useState("");
-
   const { writeContractAsync } = useWriteContract();
   const creationFee = useReadContract({
     ...curveConfig,
     functionName: "creationFee",
   });
-
-  const [showFailModal, setShowFailModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const client = useClient();
 
@@ -70,11 +63,10 @@ const CreateToken = () => {
 
   const handleError = (error: any) => {
     console.log(error);
-    setShowFailModal(true);
+    toast.error("An error occured while creating a new token", {
+      description: error,
+    });
     setLoading(false);
-    setTimeout(() => {
-      setShowFailModal(false);
-    }, 3000);
   };
 
   const handleSuccess = async (hash: Address) => {
@@ -83,23 +75,22 @@ const CreateToken = () => {
       await waitForTransactionReceipt(client, {
         hash,
       });
-      setTxnHash(hash);
-      setShowSuccessModal(true);
-      setTimeout(() => {
-        setShowSuccessModal(false);
-      }, 5000);
+      toast.success("Token created successfully", {
+        description: `${client.chain.blockExplorers.default.url}/tx/${hash}`,
+      });
     } catch (e) {
-      handleError(e);
+      handleError(e?.details ? JSON.parse(e?.details)?.message : e.name);
+    } finally {
+      setLoading(false);
+      setName("");
+      setDescription("");
+      setTicker("");
+      setPreview(undefined);
+      setSelectedFile(null);
+      setTwitter("");
+      setWebsite("");
+      setTelegram("");
     }
-    setLoading(false);
-    setName("");
-    setDescription("");
-    setTicker("");
-    setPreview(undefined);
-    setSelectedFile(null);
-    setTwitter("");
-    setWebsite("");
-    setTelegram("");
   };
 
   const handleCreateToken = async () => {
@@ -133,8 +124,10 @@ const CreateToken = () => {
         onSuccess: async (hash: Address) => {
           await handleSuccess(hash);
         },
-        onError: (error) => {
-          handleError(error.message);
+        onError: (error: unknown) => {
+          handleError(
+            error?.details ? JSON.parse(error?.details)?.message : error.name,
+          );
         },
       },
     );
@@ -196,16 +189,6 @@ const CreateToken = () => {
               </p>
             </div>
           </div>
-          {showSuccessModal && (
-            <SuccessToast
-              {...{
-                message: "Token creation successful",
-                hash: txnHash,
-                url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`,
-              }}
-            />
-          )}
-          {showFailModal && <FailedToast />}
 
           {/* INPUTS */}
           <div className="createToken__form--body">

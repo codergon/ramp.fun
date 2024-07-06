@@ -3,12 +3,7 @@ import { useWindowSize } from "react-use";
 import { truncate } from "utils/HelperUtils";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import WalletIcon from "components/common/wallet-icon";
-import {
-  useAccount,
-  useEnsAvatar,
-  useEnsName,
-  useChainId,
-} from "wagmi";
+import { useAccount, useEnsAvatar, useEnsName, useChainId } from "wagmi";
 import { ArrowUpRight, Eye, WaveSine } from "@phosphor-icons/react";
 import { useTopbarTrades, useTrades } from "hooks/useTrades";
 import { formatEther } from "viem";
@@ -28,14 +23,14 @@ const Topbar = () => {
 
   const currentChain = useChainId();
   const { width } = useWindowSize();
-  const { trades } = useTopbarTrades(100, currentChain);
+  const { data: trades } = useTopbarTrades(100, currentChain);
 
   return (
     <>
       <div className="trending">
         <div className="trending-projects">
           <div className="trending-projects--inner">
-            {trades.map((trade, index) => {
+            {trades?.map((trade, index) => {
               return (
                 <div key={`${trade.timestamp}:${index}`} className="project">
                   <img src={makeBlockie(trade.actor)} />
@@ -72,9 +67,7 @@ const Topbar = () => {
 
         <div className="c-topbar__block">
           {address && (
-            <div
-              className="frax-network"
-            >
+            <div className="frax-network">
               <button className="logo" onClick={() => open()}>
                 <img
                   className=""
