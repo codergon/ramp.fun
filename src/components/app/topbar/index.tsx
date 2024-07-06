@@ -7,12 +7,9 @@ import {
   useAccount,
   useEnsAvatar,
   useEnsName,
-  useSwitchChain,
-  useDisconnect,
   useChainId,
 } from "wagmi";
 import { ArrowUpRight, Eye, WaveSine } from "@phosphor-icons/react";
-import { useState } from "react";
 import { useTopbarTrades, useTrades } from "hooks/useTrades";
 import { formatEther } from "viem";
 import makeBlockie from "ethereum-blockies-base64";
@@ -31,10 +28,7 @@ const Topbar = () => {
 
   const currentChain = useChainId();
   const { width } = useWindowSize();
-  const { disconnect } = useDisconnect();
-  const { chains, switchChain } = useSwitchChain();
   const { trades } = useTopbarTrades(100, currentChain);
-  const [showNetworkDrop, setShowNetworkDrop] = useState(false);
 
   return (
     <>
@@ -79,47 +73,15 @@ const Topbar = () => {
         <div className="c-topbar__block">
           {address && (
             <div
-              onMouseEnter={() => setShowNetworkDrop(true)}
-              onMouseLeave={() => setShowNetworkDrop(!showNetworkDrop)}
               className="frax-network"
             >
-              <button className="logo">
+              <button className="logo" onClick={() => open()}>
                 <img
                   className=""
                   src="./assets/images/frax.png"
                   alt="frax-logo"
                 />
               </button>
-              {showNetworkDrop && (
-                <div className="dropdown-wrapper">
-                  <div className="dropdown-container">
-                    {chains.map((chain) => (
-                      <button
-                        key={chain.id}
-                        disabled={currentChain == chain.id ? true : false}
-                        onClick={() => {
-                          switchChain({ chainId: chain.id as 252 | 2522 });
-                          setShowNetworkDrop(false);
-                        }}
-                        className="border-bottom"
-                        style={
-                          currentChain == chain.id ? { background: "#333" } : {}
-                        }
-                      >
-                        {chain.name}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => {
-                        disconnect();
-                        setShowNetworkDrop(false);
-                      }}
-                    >
-                      Disconnect
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 

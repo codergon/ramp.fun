@@ -475,7 +475,6 @@ const TokenPage = () => {
                               alt=""
                             />
                             <p>ETH</p>
-                            {/* <img src="./assets/images/arrowDown.png" alt="" /> */}
                           </button>
                         </div>
                         <div className="amount-container">
@@ -542,9 +541,6 @@ const TokenPage = () => {
                     </div>
                   )}
 
-                  {/* <button className="switch-token">
-                  <img src="./assets/images/swap.png" alt="" />
-                </button> */}
                 </div>
                 <div className="btn-wrapper">
                   <button
