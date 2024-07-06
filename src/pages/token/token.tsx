@@ -457,7 +457,7 @@ const TokenPage = () => {
                             />{" "}
                             <p className="wallet-bal-wrapper">
                               <Wallet />
-                              <span>{parseFloat(ethBalance).toFixed(4)}</span>
+                              <span>{parseFloat(ethBalance).toFixed(4)}Ξ</span>
                             </p>
                           </div>
                           <p className="recieve-amount">
@@ -500,11 +500,13 @@ const TokenPage = () => {
                               {numberWithCommas(
                                 parseFloat(tokenBalance).toFixed(2),
                               )}
+                              &nbsp;
+                              {token?.symbol}
                             </span>
                           </p>{" "}
                         </div>
                         <p className="recieve-amount">
-                          You recieve <span>{ethAmountOut} ETH </span>
+                          You recieve <span>{ethAmountOut}Ξ </span>
                         </p>
                       </div>
                     </div>
