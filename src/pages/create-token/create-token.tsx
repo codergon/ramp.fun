@@ -7,7 +7,7 @@ import { CameraPlus, CaretDoubleRight, CaretUp } from "@phosphor-icons/react";
 import { useWriteContract, useReadContract, useClient } from "wagmi";
 import { curveConfig } from "../../constants/data";
 import SuccessToast from "components/modals/success-toast/successToast";
-import FailedToasts from "components/modals/failed-toast/FailedToast";
+import FailedToast from "components/modals/failed-toast/FailedToast";
 
 import Axios from "axios";
 import { Address } from "viem";
@@ -45,25 +45,28 @@ const CreateToken = () => {
     if (!e.target.files || e.target.files.length === 0) return;
     setSelectedFile(e.target.files[0]);
   };
-  
+
   const handleImageUpload = async (file: any) => {
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET_NAME);
+      formData.append("file", file);
+      formData.append(
+        "upload_preset",
+        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET_NAME,
+      );
       const data = await Axios.post(
         `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_NAME}/image/upload`,
-        formData
+        formData,
       );
       if (data.status != 200) {
-        return null
+        return null;
       }
       return data.data["secure_url"];
     } catch (e) {
       console.log(e);
-      return null
+      return null;
     }
-  }
+  };
 
   const handleError = (error: any) => {
     console.log(error);
@@ -106,7 +109,7 @@ const CreateToken = () => {
     const imageUrl = await handleImageUpload(selectedFile);
     if (!imageUrl) {
       handleError("Failed to upload image");
-      return
+      return;
     }
     await writeContractAsync(
       {
@@ -132,8 +135,8 @@ const CreateToken = () => {
         },
         onError: (error) => {
           handleError(error.message);
-        }
-      }
+        },
+      },
     );
   };
 
@@ -196,13 +199,13 @@ const CreateToken = () => {
           {showSuccessModal && (
             <SuccessToast
               {...{
-                message: "Trade sucessfully placed",
+                message: "Token creation successful",
                 hash: txnHash,
                 url: `${client.chain.blockExplorers.default.url}/tx/${txnHash}`,
               }}
             />
           )}
-          {showFailModal && <FailedToasts />}
+          {showFailModal && <FailedToast />}
 
           {/* INPUTS */}
           <div className="createToken__form--body">

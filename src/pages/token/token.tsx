@@ -11,7 +11,7 @@ import TradeRow from "components/common/trades-row/tradeRow";
 import { numberWithCommas, truncate } from "utils/HelperUtils";
 import { curveConfig, tokenConfig } from "../../constants/data";
 import { useWriteContract, useClient, useBlock, useAccount } from "wagmi";
-import FailedToasts from "../../components/modals/failed-toast/FailedToast";
+import FailedToast from "../../components/modals/failed-toast/FailedToast";
 import SuccessToast from "../../components/modals/success-toast/successToast";
 import {
   getBalance,
@@ -585,7 +585,7 @@ const TokenPage = () => {
                   )}
                   {showFailModal && (
                     <div className="marginTop">
-                      <FailedToasts />
+                      <FailedToast />
                     </div>
                   )}
                   <div className="bonding-curve-wrapper">
